@@ -36,7 +36,10 @@
             "NSExtensionActivationSupportsMovieWithMaxCount": 1,
             "NSExtensionActivationSupportsText": true
           },
-          "androidIntentFilters": ["text/*", "image/*", "video/*"]
+          "androidIntentFilters": ["text/*", "image/*", "video/*"],
+          "iosShareExtension": {
+            "bundleIdentifier": "com.alexdonnelly.ClipRackApp.share-extension"
+          }
         }
       ],
       "expo-router",
