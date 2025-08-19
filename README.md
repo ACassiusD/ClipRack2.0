@@ -1,50 +1,94 @@
-# Welcome to your Expo app 👋
+# ClipRack 📱
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+A React Native app built with Expo that allows users to share content from other apps and collect video embeds from platforms like Instagram, TikTok, and YouTube.
 
-## Get started
+## 🚨 CRITICAL: Package Manager Rules
 
-1. Install dependencies
+**⚠️ NEVER use npm or yarn in this project!**
 
-   ```bash
-   npm install
-   ```
-
-2. Start the app
-
-   ```bash
-   npx expo start
-   ```
-
-In the output, you'll find options to open the app in a
-
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
-
+### ✅ Use ONLY pnpm:
 ```bash
-npm run reset-project
+pnpm install          # Install dependencies
+pnpm add package-name # Add new packages
+pnpm remove package-name # Remove packages
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+### ❌ NEVER use:
+```bash
+npm install           # ❌ BREAKS EVERYTHING
+yarn add package-name # ❌ BREAKS EVERYTHING
+```
 
-## Learn more
+## 🚨 CRITICAL: Hard Reset Issue
 
-To learn more about developing your project with Expo, look at the following resources:
+**If you hard reset your project, you'll lose the xcode patch fix!**
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+### What Happens on Hard Reset:
+- ✅ Your code files come back
+- ✅ `package.json` with dependencies comes back  
+- ❌ **The xcode patch gets lost** - It was applied manually to `node_modules/`
+- ❌ **Share intent will break again** with the same error
 
-## Join the community
+### The Error You'll Get:
+```
+TypeError: Cannot read properties of null (reading 'path')
+```
 
-Join our community of developers creating universal apps.
+### How to Fix After Hard Reset:
+```bash
+# 1. Reinstall packages
+pnpm install
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+# 2. Apply the xcode patch manually (the patch-package will fail)
+sed -i '' 's/if (project.pbxGroupByName(group).path)/if (project.pbxGroupByName(group)\&\&project.pbxGroupByName(group).path)/' node_modules/.pnpm/xcode@3.0.1/node_modules/xcode/lib/pbxProject.js
+
+# 3. Run prebuild
+npx expo prebuild --no-install --clean
+```
+
+## 📦 Installation & Setup
+
+### 1. Prerequisites
+- Node.js 20+ (use `nvm use 20`)
+- pnpm installed globally
+- iOS: Xcode 15+ with iOS 17+ device
+
+### 2. Install Dependencies
+```bash
+nvm use 20
+pnpm install
+```
+
+### 3. iOS Setup (Required for Share Intent)
+```bash
+# Prebuild iOS project
+npx expo prebuild --no-install --clean
+
+# Open in Xcode
+open ios/ClipRack.xcodeproj
+
+# Configure signing and provisioning profiles
+# Bundle ID: com.alexdonnelly.ClipRackApp
+```
+
+### 4. Run the App
+```bash
+# iOS device
+npx expo run:ios --device
+```
+
+## 🔧 Why This Happens
+
+**Mixed package managers** + **pnpm's unique structure** + **patch-package confusion** = **patches applied to wrong locations**
+
+The xcode patch needs to be applied to the **pnpm version** of the package, not just a copy. When you hard reset, the manual fix gets lost.
+
+## 💡 Prevention
+
+1. **Only use pnpm** for this project
+2. **Don't hard reset** unless you're prepared to reapply the xcode patch
+3. **Commit the fixed xcode package** if you want it to survive resets
+
+---
+
+**Remember**: This project requires careful attention to package management and the xcode patch for share intent to work!
