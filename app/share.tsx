@@ -16,15 +16,43 @@ export default function ShareScreen() {
     }
   }, [error]);
 
-  // If no share intent, redirect to home
-  React.useEffect(() => {
-    if (!hasShareIntent) {
-      router.replace('/(tabs)');
-    }
-  }, [hasShareIntent, router]);
-
+  // If no share intent, show a message instead of redirecting
   if (!hasShareIntent) {
-    return null;
+    return (
+      <ScrollView style={styles.container}>
+        <ThemedView style={styles.header}>
+          <ThemedText type="title">Share Page</ThemedText>
+          <ThemedText type="subtitle">No content shared yet</ThemedText>
+        </ThemedView>
+
+        <ThemedView style={styles.contentContainer}>
+          <ThemedView style={styles.section}>
+            <ThemedText type="defaultSemiBold" style={styles.sectionTitle}>
+              How to Use This Page:
+            </ThemedText>
+            <ThemedText style={styles.contentText}>
+              1. Share content from another app (Instagram, Safari, etc.) to ClipRack
+            </ThemedText>
+            <ThemedText style={styles.contentText}>
+              2. The shared content will automatically appear here
+            </ThemedText>
+            <ThemedText style={styles.contentText}>
+              3. You can also manually navigate here to see this page
+            </ThemedText>
+          </ThemedView>
+
+          <ThemedView style={styles.actions}>
+            <ThemedText 
+              type="defaultSemiBold" 
+              style={styles.homeButton}
+              onPress={() => router.push('/(tabs)')}
+            >
+              Go to Home
+            </ThemedText>
+          </ThemedView>
+        </ThemedView>
+      </ScrollView>
+    );
   }
 
   return (

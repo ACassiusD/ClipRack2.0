@@ -1,7 +1,8 @@
 import { Image } from 'expo-image';
+import { useRouter } from 'expo-router';
 import { useShareIntentContext } from 'expo-share-intent';
 import React from 'react';
-import { Alert, Platform, StyleSheet } from 'react-native';
+import { Alert, Platform, StyleSheet, TouchableOpacity } from 'react-native';
 
 import { HelloWave } from '@/components/HelloWave';
 import ParallaxScrollView from '@/components/ParallaxScrollView';
@@ -10,11 +11,12 @@ import { ThemedView } from '@/components/ThemedView';
 
 export default function HomeScreen() {
   const { hasShareIntent, shareIntent, resetShareIntent, error } = useShareIntentContext();
+  const router = useRouter();
 
   // Handle any errors
   React.useEffect(() => {
     if (error) {
-      Alert.alert('Share Intent Error', error.message);
+      Alert.alert('Share Intent Error', String(error));
     }
   }, [error]);
 
@@ -86,23 +88,34 @@ export default function HomeScreen() {
               <ThemedText>Title: {shareIntent.meta.title}</ThemedText>
             )}
             
-            <ThemedText 
-              type="defaultSemiBold" 
+            <TouchableOpacity 
               style={styles.resetButton}
-              onPress={resetShareIntent}
+              onPress={() => resetShareIntent()}
             >
-              Reset Share Intent
-            </ThemedText>
+              <ThemedText type="defaultSemiBold" style={styles.buttonText}>
+                Reset Share Intent
+              </ThemedText>
+            </TouchableOpacity>
           </ThemedView>
-        ) : (
-          <ThemedText>
-            Share something to this app from another app to see it here!
-          </ThemedText>
-        )}
-      </ThemedView>
-    </ParallaxScrollView>
-  );
-}
+                  ) : (
+            <ThemedText>
+              Share something to this app from another app to see it here!
+            </ThemedText>
+          )}
+          
+          {/* Navigation Button */}
+          <TouchableOpacity 
+            style={styles.navButton}
+            onPress={() => router.push('/share')}
+          >
+            <ThemedText type="defaultSemiBold" style={styles.buttonText}>
+              Go to Share Page
+            </ThemedText>
+          </TouchableOpacity>
+        </ThemedView>
+      </ParallaxScrollView>
+    );
+  }
 
 const styles = StyleSheet.create({
   titleContainer: {
@@ -129,9 +142,23 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   resetButton: {
-    color: '#007AFF',
-    textAlign: 'center',
-    padding: 8,
+    backgroundColor: '#007AFF',
+    padding: 12,
+    borderRadius: 8,
     marginTop: 8,
+    alignItems: 'center',
+  },
+  buttonText: {
+    color: '#ffffff',
+    textAlign: 'center',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  navButton: {
+    backgroundColor: '#28a745',
+    padding: 16,
+    borderRadius: 8,
+    marginTop: 16,
+    alignItems: 'center',
   },
 });
