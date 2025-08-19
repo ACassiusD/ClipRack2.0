@@ -30,7 +30,7 @@ export default function HomeScreen() {
         />
       }>
       <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome too ClipRack!</ThemedText>
+        <ThemedText type="title">WelcomeS too ClipRack!</ThemedText>
         <HelloWave />
       </ThemedView>
       <ThemedView style={styles.stepContainer}>
