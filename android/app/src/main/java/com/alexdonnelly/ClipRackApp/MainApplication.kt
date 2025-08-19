@@ -1,4 +1,4 @@
-package com.devcassius.ClipRack
+package com.alexdonnelly.ClipRackApp
 
 import android.app.Application
 import android.content.res.Configuration

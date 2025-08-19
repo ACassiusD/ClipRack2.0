@@ -10,7 +10,7 @@
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.devcassius.ClipRack"
+      "bundleIdentifier": "com.alexdonnelly.ClipRackApp"
     },
     "android": {
       "adaptiveIcon": {
@@ -18,7 +18,7 @@
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
-      "package": "com.devcassius.ClipRack"
+      "package": "com.alexdonnelly.ClipRackApp"
     },
     "web": {
       "bundler": "metro",

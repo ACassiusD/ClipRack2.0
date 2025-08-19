@@ -1,4 +1,4 @@
-package com.devcassius.ClipRack
+package com.alexdonnelly.ClipRackApp
 import expo.modules.splashscreen.SplashScreenManager
 
 import android.os.Build

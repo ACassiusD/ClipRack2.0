@@ -42,6 +42,6 @@
       <string>com.apple.share-services</string>
     </dict>
     <key>AppGroupIdentifier</key>
-    <string>group.com.devcassius.ClipRack</string>
+    <string>group.com.alexdonnelly.ClipRackApp</string>
   </dict>
 </plist>

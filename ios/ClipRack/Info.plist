@@ -3,7 +3,7 @@
 <plist version="1.0">
   <dict>
     <key>AppGroupIdentifier</key>
-    <string>group.com.devcassius.ClipRack</string>
+    <string>group.com.alexdonnelly.ClipRackApp</string>
     <key>CADisableMinimumFrameDurationOnPhone</key>
     <true/>
     <key>CFBundleDevelopmentRegion</key>
@@ -30,7 +30,7 @@
         <key>CFBundleURLSchemes</key>
         <array>
           <string>cliprack</string>
-          <string>com.devcassius.ClipRack</string>
+          <string>com.alexdonnelly.ClipRackApp</string>
         </array>
       </dict>
     </array>

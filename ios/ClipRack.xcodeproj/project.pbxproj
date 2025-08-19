@@ -7,28 +7,28 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		10C54866B39E405A94D265DC /* MainInterface.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AC4544495A7044A6BD9C81CF /* MainInterface.storyboard */; };
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
-		2E41ABA77C454B3AB881A4D7 /* ShareExtension.appex in Copy Files */ = {isa = PBXBuildFile; fileRef = C577ECF4B8624CFAAD4D6432 /* ShareExtension.appex */; };
-		2EEBB29660884A7F80C2A771 /* ShareExtensionPreprocessor.js in Resources */ = {isa = PBXBuildFile; fileRef = F657D420853641FF852EDCBA /* ShareExtensionPreprocessor.js */; };
-		32CA5840752E8ED3C7173E38 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = BD2BB0D8F358428C880BF6E6 /* PrivacyInfo.xcprivacy */; };
 		3E461D99554A48A4959DE609 /* SplashScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AA286B85B6C04FC6940260E9 /* SplashScreen.storyboard */; };
-		81D5565BE4147DDF9DCE5EEE /* ExpoModulesProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC2D12A7134591385178BE77 /* ExpoModulesProvider.swift */; };
-		8FBC77C92A97F04FAD726074 /* libPods-ClipRack.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 30778540BAD8DA2DE2C575C5 /* libPods-ClipRack.a */; };
-		A4E0D4F4BFD94562BF4E6CE0 /* ShareViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5ACA80D49D6A49D6887C1A46 /* ShareViewController.swift */; };
+		44EB56C6E9E96DA9B699632B /* ExpoModulesProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = FE1779D9C79CA97AB46FAEE9 /* ExpoModulesProvider.swift */; };
+		7EF42FA646E3C38809271352 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = D7ACA78394C34D6FBE4C0C94 /* PrivacyInfo.xcprivacy */; };
+		7FB77B790DB449558F5BD0B8 /* ShareViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD470E54861A4EEB9A3E252D /* ShareViewController.swift */; };
+		9A29675404F04DB282C3E41D /* MainInterface.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 576777AFA4644BD48A1DAA40 /* MainInterface.storyboard */; };
+		9B8323A099D6469FB4BF3592 /* ShareExtensionPreprocessor.js in Resources */ = {isa = PBXBuildFile; fileRef = 1A770DCBA9DD464AB9669AF7 /* ShareExtensionPreprocessor.js */; };
+		A339B131180F45EA8B167EFF /* ShareExtension.appex in Copy Files */ = {isa = PBXBuildFile; fileRef = BA655C07C66348AB9C1228AB /* ShareExtension.appex */; };
 		BB2F792D24A3F905000567C9 /* Expo.plist in Resources */ = {isa = PBXBuildFile; fileRef = BB2F792C24A3F905000567C9 /* Expo.plist */; };
-		EDFF08580CDC450BB6199753 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = BD2BB0D8F358428C880BF6E6 /* PrivacyInfo.xcprivacy */; };
 		F11748422D0307B40044C1D9 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F11748412D0307B40044C1D9 /* AppDelegate.swift */; };
+		F67288DABC7E4931B2187E06 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = D7ACA78394C34D6FBE4C0C94 /* PrivacyInfo.xcprivacy */; };
+		FFA9F7FEDBD47741CE741B74 /* libPods-ClipRack.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 887E156967F5392F61F6E9D1 /* libPods-ClipRack.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
-		3C5C0090AACB45AAAAB36324 /* Copy Files */ = {
+		3CFAED207A934729B6143601 /* Copy Files */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = "";
 			dstSubfolderSpec = 13;
 			files = (
-				2E41ABA77C454B3AB881A4D7 /* ShareExtension.appex in Copy Files */,
+				A339B131180F45EA8B167EFF /* ShareExtension.appex in Copy Files */,
 			);
 			name = "Copy Files";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -39,20 +39,20 @@
 		13B07F961A680F5B00A75B9A /* ClipRack.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ClipRack.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		13B07FB51A68108700A75B9A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = ClipRack/Images.xcassets; sourceTree = "<group>"; };
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = ClipRack/Info.plist; sourceTree = "<group>"; };
-		30778540BAD8DA2DE2C575C5 /* libPods-ClipRack.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-ClipRack.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		5ACA80D49D6A49D6887C1A46 /* ShareViewController.swift */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 4; includeInIndex = 0; lastKnownFileType = sourcecode.swift; name = ShareViewController.swift; path = /Users/alex.donnelly/Projects/alex/ClipRack/ios/ShareExtension/ShareViewController.swift; sourceTree = "<group>"; };
-		9BE7939233B885B7665996E0 /* Pods-ClipRack.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ClipRack.debug.xcconfig"; path = "Target Support Files/Pods-ClipRack/Pods-ClipRack.debug.xcconfig"; sourceTree = "<group>"; };
+		1A770DCBA9DD464AB9669AF7 /* ShareExtensionPreprocessor.js */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = sourcecode.javascript; name = ShareExtensionPreprocessor.js; path = ShareExtension/ShareExtensionPreprocessor.js; sourceTree = "<group>"; };
+		5454462C703A9BBF80626230 /* Pods-ClipRack.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ClipRack.debug.xcconfig"; path = "Target Support Files/Pods-ClipRack/Pods-ClipRack.debug.xcconfig"; sourceTree = "<group>"; };
+		576777AFA4644BD48A1DAA40 /* MainInterface.storyboard */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = file.storyboard; name = MainInterface.storyboard; path = ShareExtension/MainInterface.storyboard; sourceTree = "<group>"; };
+		887E156967F5392F61F6E9D1 /* libPods-ClipRack.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-ClipRack.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		AA286B85B6C04FC6940260E9 /* SplashScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = SplashScreen.storyboard; path = ClipRack/SplashScreen.storyboard; sourceTree = "<group>"; };
-		AC4544495A7044A6BD9C81CF /* MainInterface.storyboard */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = MainInterface.storyboard; path = /Users/alex.donnelly/Projects/alex/ClipRack/ios/ShareExtension/MainInterface.storyboard; sourceTree = "<group>"; };
+		BA655C07C66348AB9C1228AB /* ShareExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; fileEncoding = 9; includeInIndex = 0; path = ShareExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		BB2F792C24A3F905000567C9 /* Expo.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Expo.plist; sourceTree = "<group>"; };
-		BD2BB0D8F358428C880BF6E6 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = PrivacyInfo.xcprivacy; path = /Users/alex.donnelly/Projects/alex/ClipRack/ios/ShareExtension/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
-		C577ECF4B8624CFAAD4D6432 /* ShareExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = undefined; name = ShareExtension.appex; path = ShareExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
-		EAA8CCDEC9AFAE7F1EABF150 /* Pods-ClipRack.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ClipRack.release.xcconfig"; path = "Target Support Files/Pods-ClipRack/Pods-ClipRack.release.xcconfig"; sourceTree = "<group>"; };
+		CB4CF4828C0E02EC6D7B3F81 /* Pods-ClipRack.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ClipRack.release.xcconfig"; path = "Target Support Files/Pods-ClipRack/Pods-ClipRack.release.xcconfig"; sourceTree = "<group>"; };
+		CD470E54861A4EEB9A3E252D /* ShareViewController.swift */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 4; includeInIndex = 0; lastKnownFileType = sourcecode.swift; name = ShareViewController.swift; path = ShareExtension/ShareViewController.swift; sourceTree = "<group>"; };
+		D7ACA78394C34D6FBE4C0C94 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = text.xml; name = PrivacyInfo.xcprivacy; path = ShareExtension/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 		F11748412D0307B40044C1D9 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AppDelegate.swift; path = ClipRack/AppDelegate.swift; sourceTree = "<group>"; };
 		F11748442D0722820044C1D9 /* ClipRack-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "ClipRack-Bridging-Header.h"; path = "ClipRack/ClipRack-Bridging-Header.h"; sourceTree = "<group>"; };
-		F657D420853641FF852EDCBA /* ShareExtensionPreprocessor.js */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = ShareExtensionPreprocessor.js; path = /Users/alex.donnelly/Projects/alex/ClipRack/ios/ShareExtension/ShareExtensionPreprocessor.js; sourceTree = "<group>"; };
-		FC2D12A7134591385178BE77 /* ExpoModulesProvider.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ExpoModulesProvider.swift; path = "Pods/Target Support Files/Pods-ClipRack/ExpoModulesProvider.swift"; sourceTree = "<group>"; };
+		FE1779D9C79CA97AB46FAEE9 /* ExpoModulesProvider.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ExpoModulesProvider.swift; path = "Pods/Target Support Files/Pods-ClipRack/ExpoModulesProvider.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -60,7 +60,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				8FBC77C92A97F04FAD726074 /* libPods-ClipRack.a in Frameworks */,
+				FFA9F7FEDBD47741CE741B74 /* libPods-ClipRack.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -80,31 +80,42 @@
 			name = ClipRack;
 			sourceTree = "<group>";
 		};
+		18E1329E5DBB40D3AC09D95F /* ExpoModulesProviders */ = {
+			isa = PBXGroup;
+			children = (
+				EAD6D5D7BB6A36B02837B6DC /* ClipRack */,
+			);
+			name = ExpoModulesProviders;
+			sourceTree = "<group>";
+		};
 		2D16E6871FA4F8E400B85C8A /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
 				ED297162215061F000B7C4FE /* JavaScriptCore.framework */,
-				30778540BAD8DA2DE2C575C5 /* libPods-ClipRack.a */,
+				887E156967F5392F61F6E9D1 /* libPods-ClipRack.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
-		3966A2DB26AAF5E77E09A9A2 /* Pods */ = {
+		43A187662E543BBF00EEAE0E /* Recovered References */ = {
 			isa = PBXGroup;
 			children = (
-				9BE7939233B885B7665996E0 /* Pods-ClipRack.debug.xcconfig */,
-				EAA8CCDEC9AFAE7F1EABF150 /* Pods-ClipRack.release.xcconfig */,
+				CD470E54861A4EEB9A3E252D /* ShareViewController.swift */,
+				1A770DCBA9DD464AB9669AF7 /* ShareExtensionPreprocessor.js */,
+				576777AFA4644BD48A1DAA40 /* MainInterface.storyboard */,
+				D7ACA78394C34D6FBE4C0C94 /* PrivacyInfo.xcprivacy */,
+			);
+			name = "Recovered References";
+			sourceTree = "<group>";
+		};
+		5431BF4BD00C1B2995408296 /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				5454462C703A9BBF80626230 /* Pods-ClipRack.debug.xcconfig */,
+				CB4CF4828C0E02EC6D7B3F81 /* Pods-ClipRack.release.xcconfig */,
 			);
 			name = Pods;
 			path = Pods;
-			sourceTree = "<group>";
-		};
-		5E44694B304F1C0ED8E82E63 /* ExpoModulesProviders */ = {
-			isa = PBXGroup;
-			children = (
-				AFCA68788F71C02EC931083D /* ClipRack */,
-			);
-			name = ExpoModulesProviders;
 			sourceTree = "<group>";
 		};
 		832341AE1AAA6A7D00B99B32 /* Libraries */ = {
@@ -121,8 +132,9 @@
 				832341AE1AAA6A7D00B99B32 /* Libraries */,
 				83CBBA001A601CBA00E9B192 /* Products */,
 				2D16E6871FA4F8E400B85C8A /* Frameworks */,
-				3966A2DB26AAF5E77E09A9A2 /* Pods */,
-				5E44694B304F1C0ED8E82E63 /* ExpoModulesProviders */,
+				43A187662E543BBF00EEAE0E /* Recovered References */,
+				5431BF4BD00C1B2995408296 /* Pods */,
+				18E1329E5DBB40D3AC09D95F /* ExpoModulesProviders */,
 			);
 			indentWidth = 2;
 			sourceTree = "<group>";
@@ -133,17 +145,9 @@
 			isa = PBXGroup;
 			children = (
 				13B07F961A680F5B00A75B9A /* ClipRack.app */,
-				C577ECF4B8624CFAAD4D6432 /* ShareExtension.appex */,
+				BA655C07C66348AB9C1228AB /* ShareExtension.appex */,
 			);
 			name = Products;
-			sourceTree = "<group>";
-		};
-		AFCA68788F71C02EC931083D /* ClipRack */ = {
-			isa = PBXGroup;
-			children = (
-				FC2D12A7134591385178BE77 /* ExpoModulesProvider.swift */,
-			);
-			name = ClipRack;
 			sourceTree = "<group>";
 		};
 		BB2F792B24A3F905000567C9 /* Supporting */ = {
@@ -155,6 +159,14 @@
 			path = ClipRack/Supporting;
 			sourceTree = "<group>";
 		};
+		EAD6D5D7BB6A36B02837B6DC /* ClipRack */ = {
+			isa = PBXGroup;
+			children = (
+				FE1779D9C79CA97AB46FAEE9 /* ExpoModulesProvider.swift */,
+			);
+			name = ClipRack;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -163,14 +175,14 @@
 			buildConfigurationList = 13B07F931A680F5B00A75B9A /* Build configuration list for PBXNativeTarget "ClipRack" */;
 			buildPhases = (
 				08A4A3CD28434E44B6B9DE2E /* [CP] Check Pods Manifest.lock */,
-				0D916F0C226EF6EC12BAA222 /* [Expo] Configure project */,
+				34FCCBE7359D3D598C5F488C /* [Expo] Configure project */,
 				13B07F871A680F5B00A75B9A /* Sources */,
 				13B07F8C1A680F5B00A75B9A /* Frameworks */,
 				13B07F8E1A680F5B00A75B9A /* Resources */,
 				00DD1BFF1BD5951E006B06BC /* Bundle React Native code and images */,
 				800E24972A6A228C8D4807E9 /* [CP] Copy Pods Resources */,
-				3C5C0090AACB45AAAAB36324 /* Copy Files */,
-				1A53F398481B99964D67ED91 /* [CP] Embed Pods Frameworks */,
+				3CFAED207A934729B6143601 /* Copy Files */,
+				67A0E6CCAA98306C2F844E02 /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -181,12 +193,12 @@
 			productReference = 13B07F961A680F5B00A75B9A /* ClipRack.app */;
 			productType = "com.apple.product-type.application";
 		};
-		B775DB0B1DC645BB867C0FF9 /* ShareExtension */ = {
+		E04AF4C20A8F4F71BFA8EB80 /* ShareExtension */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 79A64AC7FFE346A494B219BC /* Build configuration list for PBXNativeTarget "ShareExtension" */;
+			buildConfigurationList = 57EC2AF64F7349B7B1410FDC /* Build configuration list for PBXNativeTarget "ShareExtension" */;
 			buildPhases = (
-				9F4009308844463A800CEFA0 /* Sources */,
-				51C7B449EB7442FA9CB5492E /* Resources */,
+				B96216DB18E04412A0BCB1A8 /* Sources */,
+				1F9AFFA74F2B4327A20D7055 /* Resources */,
 			);
 			buildRules = (
 			);
@@ -194,7 +206,7 @@
 			);
 			name = ShareExtension;
 			productName = ShareExtension;
-			productReference = C577ECF4B8624CFAAD4D6432 /* ShareExtension.appex */;
+			productReference = BA655C07C66348AB9C1228AB /* ShareExtension.appex */;
 			productType = "com.apple.product-type.app-extension";
 		};
 /* End PBXNativeTarget section */
@@ -224,7 +236,7 @@
 			projectRoot = "";
 			targets = (
 				13B07F861A680F5B00A75B9A /* ClipRack */,
-				B775DB0B1DC645BB867C0FF9 /* ShareExtension */,
+				E04AF4C20A8F4F71BFA8EB80 /* ShareExtension */,
 			);
 		};
 /* End PBXProject section */
@@ -237,17 +249,17 @@
 				BB2F792D24A3F905000567C9 /* Expo.plist in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 				3E461D99554A48A4959DE609 /* SplashScreen.storyboard in Resources */,
-				32CA5840752E8ED3C7173E38 /* PrivacyInfo.xcprivacy in Resources */,
+				7EF42FA646E3C38809271352 /* PrivacyInfo.xcprivacy in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		51C7B449EB7442FA9CB5492E /* Resources */ = {
+		1F9AFFA74F2B4327A20D7055 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				2EEBB29660884A7F80C2A771 /* ShareExtensionPreprocessor.js in Resources */,
-				10C54866B39E405A94D265DC /* MainInterface.storyboard in Resources */,
-				EDFF08580CDC450BB6199753 /* PrivacyInfo.xcprivacy in Resources */,
+				9B8323A099D6469FB4BF3592 /* ShareExtensionPreprocessor.js in Resources */,
+				9A29675404F04DB282C3E41D /* MainInterface.storyboard in Resources */,
+				F67288DABC7E4931B2187E06 /* PrivacyInfo.xcprivacy in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -291,7 +303,7 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		0D916F0C226EF6EC12BAA222 /* [Expo] Configure project */ = {
+		34FCCBE7359D3D598C5F488C /* [Expo] Configure project */ = {
 			isa = PBXShellScriptBuildPhase;
 			alwaysOutOfDate = 1;
 			buildActionMask = 2147483647;
@@ -310,7 +322,7 @@
 			shellPath = /bin/sh;
 			shellScript = "# This script configures Expo modules and generates the modules provider file.\nbash -l -c \"./Pods/Target\\ Support\\ Files/Pods-ClipRack/expo-configure-project.sh\"\n";
 		};
-		1A53F398481B99964D67ED91 /* [CP] Embed Pods Frameworks */ = {
+		67A0E6CCAA98306C2F844E02 /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -372,58 +384,30 @@
 			buildActionMask = 2147483647;
 			files = (
 				F11748422D0307B40044C1D9 /* AppDelegate.swift in Sources */,
-				81D5565BE4147DDF9DCE5EEE /* ExpoModulesProvider.swift in Sources */,
+				44EB56C6E9E96DA9B699632B /* ExpoModulesProvider.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		9F4009308844463A800CEFA0 /* Sources */ = {
+		B96216DB18E04412A0BCB1A8 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				A4E0D4F4BFD94562BF4E6CE0 /* ShareViewController.swift in Sources */,
+				7FB77B790DB449558F5BD0B8 /* ShareViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin XCBuildConfiguration section */
-		12AA5AF5204947D198BD2EB4 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CLANG_ENABLE_MODULES = YES;
-				CODE_SIGN_ENTITLEMENTS = /Users/alex.donnelly/Projects/alex/ClipRack/ios/ShareExtension/ShareExtension.entitlements;
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					"DEBUG=1",
-					"$(inherited)",
-				);
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = "/Users/alex.donnelly/Projects/alex/ClipRack/ios/ShareExtension/ShareExtension-Info.plist";
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@executable_path/../../Frameworks",
-				);
-				MARKETING_VERSION = 1.0.0;
-				OTHER_SWIFT_FLAGS = "$(inherited) -D EXPO_CONFIGURATION_DEBUG";
-				PRODUCT_BUNDLE_IDENTIFIER = "com.devcassius.ClipRack.share-extension";
-				PRODUCT_NAME = ShareExtension;
-				SKIP_INSTALL = YES;
-				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-			};
-			name = Debug;
-		};
 		13B07F941A680F5B00A75B9A /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 9BE7939233B885B7665996E0 /* Pods-ClipRack.debug.xcconfig */;
+			baseConfigurationReference = 5454462C703A9BBF80626230 /* Pods-ClipRack.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = ClipRack/ClipRack.entitlements;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 92MPU3L8PL;
 				ENABLE_BITCODE = NO;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"$(inherited)",
@@ -442,7 +426,7 @@
 					"-lc++",
 				);
 				OTHER_SWIFT_FLAGS = "$(inherited) -D EXPO_CONFIGURATION_DEBUG";
-				PRODUCT_BUNDLE_IDENTIFIER = com.devcassius.ClipRack;
+				PRODUCT_BUNDLE_IDENTIFIER = com.alexdonnelly.ClipRackApp;
 				PRODUCT_NAME = ClipRack;
 				SWIFT_OBJC_BRIDGING_HEADER = "ClipRack/ClipRack-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -454,12 +438,13 @@
 		};
 		13B07F951A680F5B00A75B9A /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = EAA8CCDEC9AFAE7F1EABF150 /* Pods-ClipRack.release.xcconfig */;
+			baseConfigurationReference = CB4CF4828C0E02EC6D7B3F81 /* Pods-ClipRack.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = ClipRack/ClipRack.entitlements;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 92MPU3L8PL;
 				INFOPLIST_FILE = ClipRack/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.1;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -473,7 +458,7 @@
 					"-lc++",
 				);
 				OTHER_SWIFT_FLAGS = "$(inherited) -D EXPO_CONFIGURATION_RELEASE";
-				PRODUCT_BUNDLE_IDENTIFIER = com.devcassius.ClipRack;
+				PRODUCT_BUNDLE_IDENTIFIER = com.alexdonnelly.ClipRackApp;
 				PRODUCT_NAME = ClipRack;
 				SWIFT_OBJC_BRIDGING_HEADER = "ClipRack/ClipRack-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
@@ -481,6 +466,62 @@
 				VERSIONING_SYSTEM = "apple-generic";
 			};
 			name = Release;
+		};
+		27F7550191F3463B87147C3D /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = /Users/alex.donnelly/Projects/alex/ClipRack/ios/ShareExtension/ShareExtension.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 92MPU3L8PL;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "/Users/alex.donnelly/Projects/alex/ClipRack/ios/ShareExtension/ShareExtension-Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0.0;
+				OTHER_SWIFT_FLAGS = "$(inherited) -D EXPO_CONFIGURATION_RELEASE";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.alexdonnelly.ClipRackApp.share-extension";
+				PRODUCT_NAME = ShareExtension;
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		60B098A41F6C4DEB95F89267 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = /Users/alex.donnelly/Projects/alex/ClipRack/ios/ShareExtension/ShareExtension.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 92MPU3L8PL;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "/Users/alex.donnelly/Projects/alex/ClipRack/ios/ShareExtension/ShareExtension-Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0.0;
+				OTHER_SWIFT_FLAGS = "$(inherited) -D EXPO_CONFIGURATION_DEBUG";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.alexdonnelly.ClipRackApp.share-extension";
+				PRODUCT_NAME = ShareExtension;
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
 		};
 		83CBBA201A601CBA00E9B192 /* Debug */ = {
 			isa = XCBuildConfiguration;
@@ -541,7 +582,7 @@
 					"$(inherited)",
 					" ",
 				);
-				REACT_NATIVE_PATH = "${PODS_ROOT}/../../node_modules/.pnpm/react-native@0.79.5_@babel+core@7.28.3_@types+react@19.0.14_react@19.0.0/node_modules/react-native";
+				REACT_NATIVE_PATH = "${PODS_ROOT}/../../node_modules/react-native";
 				SDKROOT = iphoneos;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) DEBUG";
 				USE_HERMES = true;
@@ -599,35 +640,10 @@
 					"$(inherited)",
 					" ",
 				);
-				REACT_NATIVE_PATH = "${PODS_ROOT}/../../node_modules/.pnpm/react-native@0.79.5_@babel+core@7.28.3_@types+react@19.0.14_react@19.0.0/node_modules/react-native";
+				REACT_NATIVE_PATH = "${PODS_ROOT}/../../node_modules/react-native";
 				SDKROOT = iphoneos;
 				USE_HERMES = true;
 				VALIDATE_PRODUCT = YES;
-			};
-			name = Release;
-		};
-		E2DE24AB8D744C1EAF7E990B /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CLANG_ENABLE_MODULES = YES;
-				CODE_SIGN_ENTITLEMENTS = /Users/alex.donnelly/Projects/alex/ClipRack/ios/ShareExtension/ShareExtension.entitlements;
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = "/Users/alex.donnelly/Projects/alex/ClipRack/ios/ShareExtension/ShareExtension-Info.plist";
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@executable_path/../../Frameworks",
-				);
-				MARKETING_VERSION = 1.0.0;
-				OTHER_SWIFT_FLAGS = "$(inherited) -D EXPO_CONFIGURATION_RELEASE";
-				PRODUCT_BUNDLE_IDENTIFIER = "com.devcassius.ClipRack.share-extension";
-				PRODUCT_NAME = ShareExtension;
-				SKIP_INSTALL = YES;
-				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
 		};
@@ -643,11 +659,11 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		79A64AC7FFE346A494B219BC /* Build configuration list for PBXNativeTarget "ShareExtension" */ = {
+		57EC2AF64F7349B7B1410FDC /* Build configuration list for PBXNativeTarget "ShareExtension" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				12AA5AF5204947D198BD2EB4 /* Debug */,
-				E2DE24AB8D744C1EAF7E990B /* Release */,
+				60B098A41F6C4DEB95F89267 /* Debug */,
+				27F7550191F3463B87147C3D /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
