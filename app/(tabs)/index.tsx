@@ -1,5 +1,7 @@
 import { Image } from 'expo-image';
-import { Platform, StyleSheet } from 'react-native';
+import { useShareIntentContext } from 'expo-share-intent';
+import React from 'react';
+import { Alert, Platform, StyleSheet } from 'react-native';
 
 import { HelloWave } from '@/components/HelloWave';
 import ParallaxScrollView from '@/components/ParallaxScrollView';
@@ -7,6 +9,15 @@ import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 
 export default function HomeScreen() {
+  const { hasShareIntent, shareIntent, resetShareIntent, error } = useShareIntentContext();
+
+  // Handle any errors
+  React.useEffect(() => {
+    if (error) {
+      Alert.alert('Share Intent Error', error.message);
+    }
+  }, [error]);
+
   return (
     <ParallaxScrollView
       headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
@@ -51,6 +62,44 @@ export default function HomeScreen() {
           <ThemedText type="defaultSemiBold">app-example</ThemedText>.
         </ThemedText>
       </ThemedView>
+
+      {/* Share Intent Demo Section */}
+      <ThemedView style={styles.stepContainer}>
+        <ThemedText type="subtitle">Share Intent Demo</ThemedText>
+        {hasShareIntent ? (
+          <ThemedView style={styles.shareContent}>
+            <ThemedText type="defaultSemiBold">Shared Content:</ThemedText>
+            
+            {shareIntent.text && (
+              <ThemedText>Text: {shareIntent.text}</ThemedText>
+            )}
+            
+            {shareIntent.webUrl && (
+              <ThemedText>URL: {shareIntent.webUrl}</ThemedText>
+            )}
+            
+            {shareIntent.files && shareIntent.files.length > 0 && (
+              <ThemedText>Files: {shareIntent.files.length} file(s)</ThemedText>
+            )}
+            
+            {shareIntent.meta?.title && (
+              <ThemedText>Title: {shareIntent.meta.title}</ThemedText>
+            )}
+            
+            <ThemedText 
+              type="defaultSemiBold" 
+              style={styles.resetButton}
+              onPress={resetShareIntent}
+            >
+              Reset Share Intent
+            </ThemedText>
+          </ThemedView>
+        ) : (
+          <ThemedText>
+            Share something to this app from another app to see it here!
+          </ThemedText>
+        )}
+      </ThemedView>
     </ParallaxScrollView>
   );
 }
@@ -71,5 +120,18 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     position: 'absolute',
+  },
+  shareContent: {
+    gap: 8,
+    padding: 16,
+    backgroundColor: 'rgba(0, 0, 0, 0.05)',
+    borderRadius: 8,
+    marginTop: 8,
+  },
+  resetButton: {
+    color: '#007AFF',
+    textAlign: 'center',
+    padding: 8,
+    marginTop: 8,
   },
 });
