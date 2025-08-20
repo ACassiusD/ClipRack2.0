@@ -2,7 +2,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useShareIntentContext } from 'expo-share-intent';
 import { StatusBar } from 'expo-status-bar';
 import React from 'react';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { WebView } from 'react-native-webview';
 
 type Provider = 'menu' | 'youtube' | 'tiktok' | 'instagram';
@@ -318,7 +318,7 @@ export default function EmbedsScreen() {
   const allEmbeds = [...STARTER_EMBEDS, ...dynamicEmbeds].sort((a, b) => b.createdAt - a.createdAt);
 
   const renderMenu = () => (
-    <View style={styles.menuContainer}>
+    <ScrollView style={styles.menuContainer} showsVerticalScrollIndicator={false}>
       <Text style={styles.title}>ClipRack Clips2</Text>
       
       {/* Share Intent Status */}
@@ -339,59 +339,59 @@ export default function EmbedsScreen() {
         </View>
       )}
       
-                      {isLoading ? (
-          <Text style={styles.loadingText}>Loading clips...</Text>
-        ) : (
-          <View style={styles.cards}>
-            {allEmbeds.map((embed) => {
-              const isNewlyShared = dynamicEmbeds.some(e => e.id === embed.id);
-              const isJustCreated = hasShareIntent && shareIntent.webUrl && 
-                createEmbedFromUrl(shareIntent.webUrl)?.url === embed.url;
-              
-              return (
-                <View 
-                  key={embed.id}
-                  style={[
-                    styles.card,
-                    isNewlyShared && styles.dynamicCard,
-                    isJustCreated && styles.justCreatedCard
-                  ]} 
+      {isLoading ? (
+        <Text style={styles.loadingText}>Loading clips...</Text>
+      ) : (
+        <View style={styles.cards}>
+          {allEmbeds.map((embed) => {
+            const isNewlyShared = dynamicEmbeds.some(e => e.id === embed.id);
+            const isJustCreated = hasShareIntent && shareIntent.webUrl && 
+              createEmbedFromUrl(shareIntent.webUrl)?.url === embed.url;
+            
+            return (
+              <View 
+                key={embed.id}
+                style={[
+                  styles.card,
+                  isNewlyShared && styles.dynamicCard,
+                  isJustCreated && styles.justCreatedCard
+                ]} 
+              >
+                <TouchableOpacity 
+                  style={styles.cardContent}
+                  onPress={() => {
+                    setSelectedEmbed(embed);
+                    setActive(embed.type);
+                  }}
                 >
-                  <TouchableOpacity 
-                    style={styles.cardContent}
-                    onPress={() => {
-                      setSelectedEmbed(embed);
-                      setActive(embed.type);
-                    }}
-                  >
-                    <Text style={styles.cardTitle}>{embed.title}</Text>
-                    <Text style={styles.cardSubtitle}>{embed.subtitle}</Text>
-                    {isNewlyShared && (
-                      <Text style={styles.dynamicBadge}>🆕 Shared</Text>
-                    )}
-                    {isJustCreated && (
-                      <Text style={styles.justCreatedBadge}>✨ Just Added!</Text>
-                    )}
-                  </TouchableOpacity>
-                  
-                  <TouchableOpacity 
-                    style={styles.deleteButton}
-                    onPress={() => deleteEmbed(embed.id)}
-                  >
-                    <Text style={styles.deleteButtonText}>🗑️</Text>
-                  </TouchableOpacity>
-                </View>
-              );
-            })}
-          </View>
-        )}
+                  <Text style={styles.cardTitle}>{embed.title}</Text>
+                  <Text style={styles.cardSubtitle}>{embed.subtitle}</Text>
+                  {isNewlyShared && (
+                    <Text style={styles.dynamicBadge}>🆕 Shared</Text>
+                  )}
+                  {isJustCreated && (
+                    <Text style={styles.justCreatedBadge}>✨ Just Added!</Text>
+                  )}
+                </TouchableOpacity>
+                
+                <TouchableOpacity 
+                  style={styles.deleteButton}
+                  onPress={() => deleteEmbed(embed.id)}
+                >
+                  <Text style={styles.deleteButtonText}>🗑️</Text>
+                </TouchableOpacity>
+              </View>
+            );
+          })}
+        </View>
+      )}
       
-              {!isLoading && allEmbeds.length === 0 && (
-          <Text style={styles.noEmbedsText}>
-            No clips available. Share a social media URL from another app to create one!
-          </Text>
-        )}
-    </View>
+      {!isLoading && allEmbeds.length === 0 && (
+        <Text style={styles.noEmbedsText}>
+          No clips available. Share a social media URL from another app to create one!
+        </Text>
+      )}
+    </ScrollView>
   );
 
   const BackFloating = () => (
