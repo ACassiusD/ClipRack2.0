@@ -2,7 +2,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useShareIntentContext } from 'expo-share-intent';
 import { StatusBar } from 'expo-status-bar';
 import React from 'react';
-import { Alert, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { WebView } from 'react-native-webview';
 
 type Provider = 'menu' | 'youtube' | 'tiktok' | 'instagram';
@@ -270,35 +270,32 @@ export default function EmbedsScreen() {
   // Process shared content and create embeds
   React.useEffect(() => {
     if (hasShareIntent && shareIntent.webUrl) {
+      console.log('🔄 Processing shared URL:', shareIntent.webUrl);
+      
       const embed = createEmbedFromUrl(shareIntent.webUrl);
+      console.log('🎬 Created embed object:', embed);
+      
       if (embed) {
         // Check if this embed already exists (by URL, not ID since ID includes timestamp)
         const exists = dynamicEmbeds.some(e => e.url === embed.url);
+        console.log('🔍 Embed already exists:', exists);
+        
         if (!exists) {
           const newEmbeds = [...dynamicEmbeds, embed];
           setDynamicEmbeds(newEmbeds);
           
           // Save to AsyncStorage
           saveDynamicEmbeds(newEmbeds);
+          console.log('💾 Saved embed to storage');
           
-          Alert.alert(
-            'New Embed Created!',
-            `Successfully created a ${embed.type} embed from the shared URL.`,
-            [
-              {
-                text: 'View Now',
-                onPress: () => {
-                  setSelectedEmbed(embed);
-                  setActive(embed.type);
-                }
-              },
-              {
-                text: 'Later',
-                style: 'cancel'
-              }
-            ]
-          );
+          // Don't automatically show the clip - just stay on the clips list
+          // User can tap on the new clip card to view it
+          console.log('💾 Clip created and saved - staying on clips list');
+        } else {
+          console.log('🔍 Clip already exists - staying on clips list');
         }
+      } else {
+        console.log('❌ Failed to create embed from URL');
       }
     }
   }, [hasShareIntent, shareIntent.webUrl, dynamicEmbeds]);
@@ -308,13 +305,16 @@ export default function EmbedsScreen() {
 
   const renderMenu = () => (
     <View style={styles.menuContainer}>
-      <Text style={styles.title}>ClipRack Embed Test</Text>
+      <Text style={styles.title}>ClipRack Clips2</Text>
       
       {/* Share Intent Status */}
       {hasShareIntent && shareIntent.webUrl && (
         <View style={styles.shareStatus}>
           <Text style={styles.shareStatusText}>
-            📱 Shared URL: {shareIntent.webUrl}
+            🎬 New clip created successfully!
+          </Text>
+          <Text style={styles.shareStatusSubtext}>
+            Tap on the clip card below to view it
           </Text>
           <TouchableOpacity 
             style={styles.clearButton}
@@ -325,37 +325,47 @@ export default function EmbedsScreen() {
         </View>
       )}
       
-      {isLoading ? (
-        <Text style={styles.loadingText}>Loading embeds...</Text>
-      ) : (
-        <View style={styles.cards}>
-          {allEmbeds.map((embed) => (
-            <TouchableOpacity 
-              key={embed.id}
-              style={[
-                styles.card,
-                dynamicEmbeds.some(e => e.id === embed.id) && styles.dynamicCard
-              ]} 
-              onPress={() => {
-                setSelectedEmbed(embed);
-                setActive(embed.type);
-              }}
-            >
-              <Text style={styles.cardTitle}>{embed.title}</Text>
-              <Text style={styles.cardSubtitle}>{embed.subtitle}</Text>
-              {dynamicEmbeds.some(e => e.id === embed.id) && (
-                <Text style={styles.dynamicBadge}>🆕 Shared</Text>
-              )}
-            </TouchableOpacity>
-          ))}
-        </View>
-      )}
+                      {isLoading ? (
+          <Text style={styles.loadingText}>Loading clips...</Text>
+        ) : (
+          <View style={styles.cards}>
+            {allEmbeds.map((embed) => {
+              const isNewlyShared = dynamicEmbeds.some(e => e.id === embed.id);
+              const isJustCreated = hasShareIntent && shareIntent.webUrl && 
+                createEmbedFromUrl(shareIntent.webUrl)?.url === embed.url;
+              
+              return (
+                <TouchableOpacity 
+                  key={embed.id}
+                  style={[
+                    styles.card,
+                    isNewlyShared && styles.dynamicCard,
+                    isJustCreated && styles.justCreatedCard
+                  ]} 
+                  onPress={() => {
+                    setSelectedEmbed(embed);
+                    setActive(embed.type);
+                  }}
+                >
+                  <Text style={styles.cardTitle}>{embed.title}</Text>
+                  <Text style={styles.cardSubtitle}>{embed.subtitle}</Text>
+                  {isNewlyShared && (
+                    <Text style={styles.dynamicBadge}>🆕 Shared</Text>
+                  )}
+                  {isJustCreated && (
+                    <Text style={styles.justCreatedBadge}>✨ Just Added!</Text>
+                  )}
+                </TouchableOpacity>
+              );
+            })}
+          </View>
+        )}
       
-      {!isLoading && allEmbeds.length === 0 && (
-        <Text style={styles.noEmbedsText}>
-          No embeds available. Share a social media URL from another app to create one!
-        </Text>
-      )}
+              {!isLoading && allEmbeds.length === 0 && (
+          <Text style={styles.noEmbedsText}>
+            No clips available. Share a social media URL from another app to create one!
+          </Text>
+        )}
     </View>
   );
 
@@ -369,27 +379,71 @@ export default function EmbedsScreen() {
   );
 
   const renderWebView = () => {
-    if (!selectedEmbed) return null;
+    if (!selectedEmbed) {
+      console.log('No selected embed, returning to menu');
+      return null;
+    }
 
-    const html = generateEmbedHtml(selectedEmbed);
-    const baseUrl = getBaseUrl(selectedEmbed.type);
+    try {
+      const html = generateEmbedHtml(selectedEmbed);
+      const baseUrl = getBaseUrl(selectedEmbed.type);
+      
+      console.log('Rendering WebView for embed:', selectedEmbed.type);
+      console.log('Base URL:', baseUrl);
+      console.log('HTML length:', html.length);
 
-    return (
-      <View style={styles.container}>
-        <StatusBar style="light" />
-        <BackFloating />
-        <WebView
-          originWhitelist={["*"]}
-          source={{ html, baseUrl }}
-          style={styles.webview}
-          javaScriptEnabled
-          domStorageEnabled
-          allowsInlineMediaPlayback
-          mediaPlaybackRequiresUserAction={false}
-          allowsFullscreenVideo
-        />
-      </View>
-    );
+      if (!html || html.length < 100) {
+        console.error('Generated HTML is too short or invalid:', html);
+        return (
+          <View style={styles.container}>
+            <StatusBar style="light" />
+            <BackFloating />
+            <View style={styles.errorContainer}>
+              <Text style={styles.errorText}>Failed to generate embed content</Text>
+              <Text style={styles.errorSubtext}>Please try again or contact support</Text>
+            </View>
+          </View>
+        );
+      }
+
+      return (
+        <View style={styles.container}>
+          <StatusBar style="light" />
+          <BackFloating />
+          <WebView
+            originWhitelist={["*"]}
+            source={{ html, baseUrl }}
+            style={styles.webview}
+            javaScriptEnabled
+            domStorageEnabled
+            allowsInlineMediaPlayback
+            mediaPlaybackRequiresUserAction={false}
+            allowsFullscreenVideo
+            onError={(syntheticEvent) => {
+              const { nativeEvent } = syntheticEvent;
+              console.error('WebView error:', nativeEvent);
+            }}
+            onHttpError={(syntheticEvent) => {
+              const { nativeEvent } = syntheticEvent;
+              console.error('WebView HTTP error:', nativeEvent);
+            }}
+          />
+        </View>
+      );
+    } catch (error) {
+      console.error('Error rendering WebView:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+      return (
+        <View style={styles.container}>
+          <StatusBar style="light" />
+          <BackFloating />
+          <View style={styles.errorContainer}>
+            <Text style={styles.errorText}>Error loading content</Text>
+            <Text style={styles.errorSubtext}>{errorMessage}</Text>
+          </View>
+        </View>
+      );
+    }
   };
 
   return active === 'menu' ? (
@@ -436,8 +490,15 @@ const styles = StyleSheet.create({
   },
   shareStatusText: {
     color: '#0f0',
+    fontSize: 14,
+    fontWeight: '600',
+    flex: 1,
+  },
+  shareStatusSubtext: {
+    color: '#0f0',
     fontSize: 12,
     flex: 1,
+    marginTop: 4,
   },
   clearButton: {
     backgroundColor: 'rgba(255, 0, 0, 0.2)',
@@ -466,6 +527,11 @@ const styles = StyleSheet.create({
     borderColor: '#0f0',
     borderWidth: 2,
   },
+  justCreatedCard: {
+    borderColor: '#ffd700',
+    borderWidth: 3,
+    backgroundColor: 'rgba(255, 215, 0, 0.1)',
+  },
   cardTitle: {
     color: '#fff',
     fontSize: 18,
@@ -482,6 +548,11 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: '600',
   },
+  justCreatedBadge: {
+    color: '#ffd700',
+    fontSize: 12,
+    fontWeight: '600',
+  },
   noEmbedsText: {
     color: '#666',
     fontSize: 16,
@@ -493,6 +564,24 @@ const styles = StyleSheet.create({
     fontSize: 18,
     textAlign: 'center',
     marginTop: 40,
+  },
+  errorContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  errorText: {
+    color: '#ff6b6b',
+    fontSize: 18,
+    fontWeight: '600',
+    textAlign: 'center',
+    marginBottom: 8,
+  },
+  errorSubtext: {
+    color: '#aaa',
+    fontSize: 14,
+    textAlign: 'center',
   },
   backButton: {
     position: 'absolute',
