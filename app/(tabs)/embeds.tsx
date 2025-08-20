@@ -239,6 +239,8 @@ const saveDynamicEmbeds = async (embeds: EmbedData[]): Promise<void> => {
   }
 };
 
+
+
 const loadDynamicEmbeds = async (): Promise<EmbedData[]> => {
   try {
     const stored = await AsyncStorage.getItem(STORAGE_KEYS.DYNAMIC_EMBEDS);
@@ -266,6 +268,18 @@ export default function EmbedsScreen() {
     };
     loadSavedEmbeds();
   }, []);
+
+  // Delete function
+  const deleteEmbed = async (embedId: string): Promise<void> => {
+    try {
+      const newEmbeds = dynamicEmbeds.filter(e => e.id !== embedId);
+      setDynamicEmbeds(newEmbeds);
+      await saveDynamicEmbeds(newEmbeds);
+      console.log('🗑️ Deleted embed:', embedId);
+    } catch (error) {
+      console.error('Failed to delete embed:', error);
+    }
+  };
 
   // Process shared content and create embeds
   React.useEffect(() => {
@@ -335,27 +349,38 @@ export default function EmbedsScreen() {
                 createEmbedFromUrl(shareIntent.webUrl)?.url === embed.url;
               
               return (
-                <TouchableOpacity 
+                <View 
                   key={embed.id}
                   style={[
                     styles.card,
                     isNewlyShared && styles.dynamicCard,
                     isJustCreated && styles.justCreatedCard
                   ]} 
-                  onPress={() => {
-                    setSelectedEmbed(embed);
-                    setActive(embed.type);
-                  }}
                 >
-                  <Text style={styles.cardTitle}>{embed.title}</Text>
-                  <Text style={styles.cardSubtitle}>{embed.subtitle}</Text>
-                  {isNewlyShared && (
-                    <Text style={styles.dynamicBadge}>🆕 Shared</Text>
-                  )}
-                  {isJustCreated && (
-                    <Text style={styles.justCreatedBadge}>✨ Just Added!</Text>
-                  )}
-                </TouchableOpacity>
+                  <TouchableOpacity 
+                    style={styles.cardContent}
+                    onPress={() => {
+                      setSelectedEmbed(embed);
+                      setActive(embed.type);
+                    }}
+                  >
+                    <Text style={styles.cardTitle}>{embed.title}</Text>
+                    <Text style={styles.cardSubtitle}>{embed.subtitle}</Text>
+                    {isNewlyShared && (
+                      <Text style={styles.dynamicBadge}>🆕 Shared</Text>
+                    )}
+                    {isJustCreated && (
+                      <Text style={styles.justCreatedBadge}>✨ Just Added!</Text>
+                    )}
+                  </TouchableOpacity>
+                  
+                  <TouchableOpacity 
+                    style={styles.deleteButton}
+                    onPress={() => deleteEmbed(embed.id)}
+                  >
+                    <Text style={styles.deleteButtonText}>🗑️</Text>
+                  </TouchableOpacity>
+                </View>
               );
             })}
           </View>
@@ -522,6 +547,26 @@ const styles = StyleSheet.create({
     padding: 16,
     borderWidth: 1,
     borderColor: '#222',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  cardContent: {
+    flex: 1,
+  },
+  deleteButton: {
+    backgroundColor: '#ff4444',
+    borderRadius: 8,
+    padding: 8,
+    marginLeft: 12,
+    minWidth: 36,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  deleteButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
   },
   dynamicCard: {
     borderColor: '#0f0',
