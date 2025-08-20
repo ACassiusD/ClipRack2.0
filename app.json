@@ -8,6 +8,9 @@
     "scheme": "cliprack",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
+    "linking": {
+      "nativeIntentRedirect": "./app/+native-intent.ts"
+    },
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.alexdonnelly.ClipRackApp"
