@@ -1,3 +1,30 @@
+/**
+ * Not Found Page for Expo Router
+ * 
+ * This file is automatically triggered when no matching route is found.
+ * It's a catch-all page that displays when users navigate to invalid URLs.
+ * 
+ * HOW IT WORKS:
+ * 1. When a user navigates to a route that doesn't exist
+ * 2. Expo Router automatically renders this component
+ * 3. Users see a friendly error message instead of a crash
+ * 
+ * WHY THIS IS NEEDED:
+ * - Provides a better user experience for invalid routes
+ * - Prevents app crashes from malformed navigation
+ * - Gives users a way to navigate back to valid routes
+ * 
+ * CONFIGURATION:
+ * - Automatically detected by Expo Router when placed in app/ directory
+ * - No additional setup required
+ * - Can be customized to match your app's design
+ * 
+ * DOCUMENTATION:
+ * - See: https://docs.expo.dev/router/error-handling/
+ * 
+ * @param error - The error that caused this page to render
+ * @param retry - Function to retry the failed navigation
+ */
 import { Link, Stack, useLocalSearchParams, usePathname } from 'expo-router';
 import { useEffect } from 'react';
 import { StyleSheet } from 'react-native';
