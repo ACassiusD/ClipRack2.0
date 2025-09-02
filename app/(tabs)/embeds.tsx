@@ -12,7 +12,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useShareIntentContext } from 'expo-share-intent';
 import { StatusBar } from 'expo-status-bar';
 import React from 'react';
-import { FlatList, Image, Text, TouchableOpacity, View } from 'react-native';
+import { FlatList, Image, RefreshControl, Text, TouchableOpacity, View } from 'react-native';
 import { WebView } from 'react-native-webview';
 
 import { STARTER_EMBEDS, STORAGE_KEYS } from '../../src/embeds/constants';
@@ -379,6 +379,7 @@ export default function EmbedsScreen() {
   const [showShareBanner, setShowShareBanner] = React.useState(false);
   const [showFilterPage, setShowFilterPage] = React.useState(false);
   const [selectedSites, setSelectedSites] = React.useState<Set<string>>(new Set(['youtube', 'tiktok', 'instagram']));
+  const [refreshing, setRefreshing] = React.useState(false);
   
   const { hasShareIntent, shareIntent, resetShareIntent } = useShareIntentContext();
 
@@ -428,6 +429,25 @@ export default function EmbedsScreen() {
       console.error('Failed to delete embed:', error);
     }
   };
+
+  /** Refreshes the clips list */
+  const onRefresh = React.useCallback(async () => {
+    setRefreshing(true);
+    try {
+      // Reload saved embeds
+      const saved = await loadDynamicEmbeds();
+      setDynamicEmbeds(saved);
+      
+      // Clear TikTok thumbnails to force re-fetch
+      setTiktokThumbnails({});
+      
+      console.log('🔄 Refreshed clips list');
+    } catch (error) {
+      console.error('Failed to refresh clips:', error);
+    } finally {
+      setRefreshing(false);
+    }
+  }, []);
 
   // Process shared content and create embeds
   React.useEffect(() => {
@@ -667,6 +687,15 @@ export default function EmbedsScreen() {
           columnWrapperStyle={styles.row}
           contentContainerStyle={styles.gridContent}
           showsVerticalScrollIndicator={false}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={onRefresh}
+              tintColor="#e8e8ea"
+              colors={['#e8e8ea']}
+              progressBackgroundColor="#0f1013"
+            />
+          }
         />
       ) : (
         <Text style={styles.noEmbedsText}>
