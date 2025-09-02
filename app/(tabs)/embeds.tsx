@@ -318,8 +318,12 @@ export default function EmbedsScreen() {
   const allEmbeds = [...STARTER_EMBEDS, ...dynamicEmbeds].sort((a, b) => b.createdAt - a.createdAt);
 
   const renderMenu = () => (
-    <ScrollView style={styles.menuContainer} showsVerticalScrollIndicator={false}>
-      <Text style={styles.title}>ClipRack Clips2</Text>
+    <ScrollView 
+      style={styles.menuContainer} 
+      showsVerticalScrollIndicator={false}
+      contentContainerStyle={styles.scrollContent}
+    >
+      <Text style={styles.title}>All Saved Clips</Text>
       
       {/* Share Intent Status */}
       {hasShareIntent && shareIntent.webUrl && (
@@ -494,6 +498,9 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: 20,
     paddingTop: 80,
+  },
+  scrollContent: {
+    paddingBottom: 100, // Add bottom padding to avoid tab bar overlap
   },
   title: {
     color: '#fff',
