@@ -522,6 +522,18 @@ export default function EmbedsScreen() {
     if (embed.type === 'tiktok' && embed.postId) {
       thumbnailUrl = tiktokThumbnails[embed.postId] || null;
     }
+
+    // Get platform display name and color
+    const getPlatformInfo = (type: string) => {
+      switch (type) {
+        case 'youtube': return { name: 'YouTube', color: '#FF0000' };
+        case 'tiktok': return { name: 'TikTok', color: '#000000' };
+        case 'instagram': return { name: 'Instagram', color: '#E4405F' };
+        default: return { name: 'Unknown', color: '#666666' };
+      }
+    };
+
+    const platformInfo = getPlatformInfo(embed.type || '');
     
     return (
       <View style={styles.gridCard}>
@@ -594,25 +606,29 @@ export default function EmbedsScreen() {
               </View>
             </View>
             
-            {/* Badges */}
+            {/* Platform Tag */}
+            <View style={[
+              styles.platformTag,
+              embed.type === 'youtube' && styles.platformTagYouTube,
+              embed.type === 'tiktok' && styles.platformTagTikTok,
+              embed.type === 'instagram' && styles.platformTagInstagram,
+            ]}>
+              {embed.type === 'tiktok' ? (
+                <View style={styles.platformTagTikTokGradient}>
+                  <View style={[styles.tiktokColorSection, styles.tiktokColorSection1]} />
+                  <View style={[styles.tiktokColorSection, styles.tiktokColorSection2]} />
+                  <View style={[styles.tiktokColorSection, styles.tiktokColorSection3]} />
+                </View>
+              ) : null}
+              <Text style={[styles.platformTagText, { zIndex: 1, position: 'relative' }]}>{platformInfo.name}</Text>
+            </View>
+            
+            {/* New Badge */}
             {isMostRecent && (
               <View style={styles.badgeContainer}>
                 <Text style={styles.newBadge}>New</Text>
               </View>
             )}
-          </View>
-          
-          {/* Card Info */}
-          <View style={styles.cardInfo}>
-            <Text style={styles.cardTitle} numberOfLines={2}>
-              {embed.title}
-            </Text>
-            <Text style={styles.cardSubtitle} numberOfLines={1}>
-              {embed.subtitle}
-            </Text>
-            <Text style={styles.cardPlatform}>
-              {embed.type || 'unknown'} • {embed.type === 'youtube' ? 'YouTube' : embed.type === 'tiktok' ? 'TikTok' : embed.type === 'instagram' ? 'Instagram' : 'Unknown'}
-            </Text>
           </View>
         </TouchableOpacity>
         

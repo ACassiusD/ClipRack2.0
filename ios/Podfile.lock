@@ -51,6 +51,8 @@ PODS:
     - SDWebImageWebPCoder (~> 0.14.6)
   - ExpoKeepAwake (14.1.4):
     - ExpoModulesCore
+  - ExpoLinearGradient (14.1.5):
+    - ExpoModulesCore
   - ExpoLinking (7.1.7):
     - ExpoModulesCore
   - ExpoModulesCore (2.5.0):
@@ -2080,9 +2082,9 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - Yoga
-  - SDWebImage (5.21.1):
-    - SDWebImage/Core (= 5.21.1)
-  - SDWebImage/Core (5.21.1)
+  - SDWebImage (5.21.2):
+    - SDWebImage/Core (= 5.21.2)
+  - SDWebImage/Core (5.21.2)
   - SDWebImageAVIFCoder (0.11.0):
     - libavif/core (>= 0.11.0)
     - SDWebImage (~> 5.10)
@@ -2107,6 +2109,7 @@ DEPENDENCIES:
   - "ExpoHead (from `../node_modules/.pnpm/expo-router@5.1.4_860e59b92a539ad758a0c43194bf2954/node_modules/expo-router/ios`)"
   - "ExpoImage (from `../node_modules/.pnpm/expo-image@2.4.0_expo@53.0.20_@babel+core@7.28.3_@expo+metro-runtime@5.0.4_react-native_9b0849c343a6954019f08107294a4171/node_modules/expo-image/ios`)"
   - ExpoKeepAwake (from `../node_modules/expo-keep-awake/ios`)
+  - "ExpoLinearGradient (from `../node_modules/.pnpm/expo-linear-gradient@14.1.5_expo@53.0.20_@babel+core@7.28.3_@expo+metro-runtime@5.0.4_r_e5f5fbae6fb00bd1a900ff334306e7dd/node_modules/expo-linear-gradient/ios`)"
   - "ExpoLinking (from `../node_modules/.pnpm/expo-linking@7.1.7_expo@53.0.20_@babel+core@7.28.3_@expo+metro-runtime@5.0.4_react-nati_081db75286ea8f5f2777d1c1b89f860b/node_modules/expo-linking/ios`)"
   - ExpoModulesCore (from `../node_modules/expo-modules-core`)
   - "ExpoShareIntentModule (from `../node_modules/.pnpm/expo-share-intent@4.1.1_3cf4549e8ae16e6ef4c198ee8a965521/node_modules/expo-share-intent/ios`)"
@@ -2227,6 +2230,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/.pnpm/expo-image@2.4.0_expo@53.0.20_@babel+core@7.28.3_@expo+metro-runtime@5.0.4_react-native_9b0849c343a6954019f08107294a4171/node_modules/expo-image/ios"
   ExpoKeepAwake:
     :path: "../node_modules/expo-keep-awake/ios"
+  ExpoLinearGradient:
+    :path: "../node_modules/.pnpm/expo-linear-gradient@14.1.5_expo@53.0.20_@babel+core@7.28.3_@expo+metro-runtime@5.0.4_r_e5f5fbae6fb00bd1a900ff334306e7dd/node_modules/expo-linear-gradient/ios"
   ExpoLinking:
     :path: "../node_modules/.pnpm/expo-linking@7.1.7_expo@53.0.20_@babel+core@7.28.3_@expo+metro-runtime@5.0.4_react-nati_081db75286ea8f5f2777d1c1b89f860b/node_modules/expo-linking/ios"
   ExpoModulesCore:
@@ -2404,6 +2409,7 @@ SPEC CHECKSUMS:
   ExpoHead: a7b66cbaeeb51f4a85338d335a0f5467e29a2c90
   ExpoImage: e4102c93d1dbe99ff54b075452d1bc9d6ec21b7c
   ExpoKeepAwake: bf0811570c8da182bfb879169437d4de298376e7
+  ExpoLinearGradient: 7734c8059972fcf691fb4330bcdf3390960a152d
   ExpoLinking: d5c183998ca6ada66ff45e407e0f965b398a8902
   ExpoModulesCore: 00a1b5c73248465bd0b93f59f8538c4573dac579
   ExpoShareIntentModule: 324b806ecdbe15b93964bccb4a407a5b4fff1267
@@ -2487,7 +2493,7 @@ SPEC CHECKSUMS:
   RNGestureHandler: 7d0931a61d7ba0259f32db0ba7d0963c3ed15d2b
   RNReanimated: 781e895b6c048c4126e2d29b64ff6da702a7ede5
   RNScreens: 482e9707f9826230810c92e765751af53826d509
-  SDWebImage: f29024626962457f3470184232766516dee8dfea
+  SDWebImage: 9f177d83116802728e122410fb25ad88f5c7608a
   SDWebImageAVIFCoder: 00310d246aab3232ce77f1d8f0076f8c4b021d90
   SDWebImageSVGCoder: 15a300a97ec1c8ac958f009c02220ac0402e936c
   SDWebImageWebPCoder: e38c0a70396191361d60c092933e22c20d5b1380

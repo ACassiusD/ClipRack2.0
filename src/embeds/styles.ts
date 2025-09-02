@@ -120,6 +120,7 @@ export const styles = StyleSheet.create({
   },
   cardTouchable: {
     flex: 1,
+    height: cardHeight,
   },
   thumbnailContainer: {
     position: 'relative',
@@ -169,10 +170,10 @@ export const styles = StyleSheet.create({
   badgeContainer: {
     position: 'absolute',
     top: 8,
-    right: 8,
+    left: 8,
   },
   newBadge: {
-    backgroundColor: 'rgba(0, 123, 255, 0.9)',
+    backgroundColor: 'rgba(0, 123, 255, 0.7)',
     color: '#fff',
     fontSize: 10,
     fontWeight: '700',
@@ -181,6 +182,65 @@ export const styles = StyleSheet.create({
     borderRadius: 8,
     textTransform: 'uppercase',
     letterSpacing: 0.5,
+  },
+  platformTag: {
+    position: 'absolute',
+    bottom: 8,
+    left: 8,
+    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 6,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.15)',
+  },
+  platformTagYouTube: {
+    backgroundColor: 'rgba(204, 0, 0, 0.3)',
+    borderColor: 'rgba(255, 0, 0, 0.2)',
+  },
+  platformTagTikTok: {
+    backgroundColor: 'transparent',
+    borderColor: 'rgba(0, 242, 234, 0.3)',
+    overflow: 'hidden',
+  },
+  platformTagTikTokGradient: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    borderRadius: 6,
+    overflow: 'hidden',
+    flexDirection: 'column',
+  },
+  tiktokColorSection: {
+    flex: 1,
+    height: '100%',
+  },
+  tiktokColorSection1: {
+    backgroundColor: 'rgba(0, 242, 234, 0.3)',
+  },
+  tiktokColorSection2: {
+    backgroundColor: 'rgba(0, 0, 0, 0.3)',
+  },
+  tiktokColorSection3: {
+    backgroundColor: 'rgba(255, 0, 80, 0.3)',
+  },
+  platformTagInstagram: {
+    backgroundColor: 'rgba(228, 64, 95, 0.3)',
+    borderColor: 'rgba(255, 100, 130, 0.2)',
+  },
+  platformTagText: {
+    color: '#fff',
+    fontSize: 10,
+    fontWeight: '600',
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+    textAlign: 'center',
+    width: '100%',
+    textShadowColor: '#000000',
+    textShadowOffset: { width: 2, height: 2 },
+    textShadowRadius: 2,
   },
   cardInfo: {
     padding: 10,
@@ -204,8 +264,8 @@ export const styles = StyleSheet.create({
   deleteButton: {
     position: 'absolute',
     top: 8,
-    left: 8,
-    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    right: 8,
+    backgroundColor: 'rgba(0, 0, 0, 0.6)',
     borderRadius: 16,
     width: 32,
     height: 32,
