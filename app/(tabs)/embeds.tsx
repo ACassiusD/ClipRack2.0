@@ -126,6 +126,33 @@ const getBaseUrl = (type: 'youtube' | 'tiktok' | 'instagram'): string => {
   }
 };
 
+// TikTok thumbnail fetching function
+const fetchTikTokThumbnail = async (videoId: string): Promise<string | null> => {
+  try {
+    // Try TikTok's oEmbed API first
+    const oembedUrl = `https://www.tiktok.com/oembed?url=https://www.tiktok.com/@username/video/${videoId}`;
+    const response = await fetch(oembedUrl);
+    
+    if (response.ok) {
+      const data = await response.json();
+      if (data.thumbnail_url) {
+        console.log('✅ TikTok thumbnail from oEmbed:', data.thumbnail_url);
+        return data.thumbnail_url;
+      }
+    }
+    
+    // Fallback: Try to construct thumbnail URL from video ID
+    // This is a common pattern for TikTok thumbnails
+    const fallbackUrl = `https://p16-sign-va.tiktokcdn-us.com/obj/tos-useast2a-p-0037-euttp/${videoId}_n.jpeg`;
+    console.log('🔄 Trying TikTok fallback thumbnail:', fallbackUrl);
+    return fallbackUrl;
+    
+  } catch (error) {
+    console.log('❌ TikTok thumbnail fetch error:', error);
+    return null;
+  }
+};
+
 // Get thumbnail URL for each platform
 const getThumbnailUrl = (embed: EmbedData): string | null => {
   switch (embed.type) {
@@ -135,10 +162,10 @@ const getThumbnailUrl = (embed: EmbedData): string | null => {
       }
       break;
     case 'tiktok':
-      // TikTok doesn't have a simple thumbnail API, we'll use a placeholder
+      // TikTok thumbnails need to be fetched dynamically
       return null;
     case 'instagram':
-      // Instagram doesn't have a simple thumbnail API, we'll use a placeholder
+      // Instagram uses WebView embeds, no thumbnail needed
       return null;
   }
   return null;
@@ -285,6 +312,7 @@ export default function EmbedsScreen() {
   const [selectedEmbed, setSelectedEmbed] = React.useState<EmbedData | null>(null);
   const [dynamicEmbeds, setDynamicEmbeds] = React.useState<EmbedData[]>([]);
   const [isLoading, setIsLoading] = React.useState(true);
+  const [tiktokThumbnails, setTiktokThumbnails] = React.useState<Record<string, string>>({});
   
   const { hasShareIntent, shareIntent, resetShareIntent } = useShareIntentContext();
 
@@ -297,6 +325,31 @@ export default function EmbedsScreen() {
     };
     loadSavedEmbeds();
   }, []);
+
+  // Fetch TikTok thumbnails for all TikTok embeds
+  React.useEffect(() => {
+    const fetchTikTokThumbnails = async () => {
+      const allEmbeds = [...STARTER_EMBEDS, ...dynamicEmbeds];
+      const tiktokEmbeds = allEmbeds.filter(embed => embed.type === 'tiktok' && embed.postId);
+      
+      for (const embed of tiktokEmbeds) {
+        if (embed.postId && !tiktokThumbnails[embed.postId]) {
+          console.log('🔄 Fetching TikTok thumbnail for:', embed.postId);
+          const thumbnailUrl = await fetchTikTokThumbnail(embed.postId);
+          if (thumbnailUrl) {
+            setTiktokThumbnails(prev => ({
+              ...prev,
+              [embed.postId!]: thumbnailUrl
+            }));
+          }
+        }
+      }
+    };
+
+    if (!isLoading) {
+      fetchTikTokThumbnails();
+    }
+  }, [dynamicEmbeds, isLoading, tiktokThumbnails]);
 
   // Delete function
   const deleteEmbed = async (embedId: string): Promise<void> => {
@@ -350,7 +403,12 @@ export default function EmbedsScreen() {
     const isNewlyShared = dynamicEmbeds.some(e => e.id === embed.id);
     const isJustCreated = hasShareIntent && shareIntent.webUrl && 
       createEmbedFromUrl(shareIntent.webUrl)?.url === embed.url;
-    const thumbnailUrl = getThumbnailUrl(embed);
+    
+    // Get thumbnail URL based on platform
+    let thumbnailUrl = getThumbnailUrl(embed);
+    if (embed.type === 'tiktok' && embed.postId) {
+      thumbnailUrl = tiktokThumbnails[embed.postId] || null;
+    }
     
     return (
       <View style={styles.gridCard}>
@@ -395,14 +453,20 @@ export default function EmbedsScreen() {
                 }}
               />
             ) : thumbnailUrl ? (
-              // YouTube: Use thumbnail image
+              // YouTube/TikTok: Use thumbnail image
               <Image 
                 source={{ uri: thumbnailUrl }} 
                 style={styles.thumbnail}
                 resizeMode="cover"
+                onError={() => {
+                  console.log('❌ Failed to load thumbnail:', thumbnailUrl);
+                }}
+                onLoad={() => {
+                  console.log('✅ Thumbnail loaded successfully:', thumbnailUrl);
+                }}
               />
             ) : (
-              // TikTok: Show placeholder for now
+              // Fallback: Show placeholder
               <View style={[styles.thumbnail, styles.placeholderThumbnail]}>
                 <Text style={styles.placeholderText}>
                   {embed.type.toUpperCase()}
