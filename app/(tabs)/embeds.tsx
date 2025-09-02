@@ -9,6 +9,7 @@
  * - Delete functionality for individual clips
  */
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as Haptics from 'expo-haptics';
 import { useShareIntentContext } from 'expo-share-intent';
 import { StatusBar } from 'expo-status-bar';
 import React from 'react';
@@ -640,7 +641,10 @@ export default function EmbedsScreen() {
         <Text style={styles.title}>Saved Clips</Text>
         <TouchableOpacity 
           style={styles.filterButton}
-          onPress={() => setShowFilterPage(true)}
+          onPress={() => {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+            setShowFilterPage(true);
+          }}
         >
           <Text style={styles.filterButtonText}>🔍</Text>
         </TouchableOpacity>
@@ -666,6 +670,7 @@ export default function EmbedsScreen() {
             <TouchableOpacity 
               style={styles.clearButton}
               onPress={() => {
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                 setShowShareBanner(false);
                 resetShareIntent();
               }}
@@ -724,6 +729,9 @@ export default function EmbedsScreen() {
     ];
 
     const toggleSite = (siteKey: string) => {
+      // Add haptic feedback
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      
       const newSelectedSites = new Set(selectedSites);
       if (newSelectedSites.has(siteKey)) {
         newSelectedSites.delete(siteKey);
@@ -740,7 +748,10 @@ export default function EmbedsScreen() {
           <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 32 }}>
             <TouchableOpacity 
               style={styles.backButton}
-              onPress={() => setShowFilterPage(false)}
+              onPress={() => {
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                setShowFilterPage(false);
+              }}
             >
               <Text style={styles.backButtonText}>←</Text>
             </TouchableOpacity>
