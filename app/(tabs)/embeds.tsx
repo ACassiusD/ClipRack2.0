@@ -376,6 +376,7 @@ export default function EmbedsScreen() {
   const [dynamicEmbeds, setDynamicEmbeds] = React.useState<EmbedData[]>([]);
   const [isLoading, setIsLoading] = React.useState(true);
   const [tiktokThumbnails, setTiktokThumbnails] = React.useState<Record<string, string>>({});
+  const [showShareBanner, setShowShareBanner] = React.useState(false);
   
   const { hasShareIntent, shareIntent, resetShareIntent } = useShareIntentContext();
 
@@ -448,6 +449,12 @@ export default function EmbedsScreen() {
             saveDynamicEmbeds(newEmbeds);
             console.log('💾 Saved embed to storage');
             
+            // Show the banner for 8 seconds
+            setShowShareBanner(true);
+            setTimeout(() => {
+              setShowShareBanner(false);
+            }, 8000);
+            
             // Don't automatically show the clip - just stay on the clips list
             // User can tap on the new clip card to view it
             console.log('💾 Clip created and saved - staying on clips list');
@@ -463,12 +470,27 @@ export default function EmbedsScreen() {
     }
   }, [hasShareIntent, shareIntent.webUrl, dynamicEmbeds]);
 
-  // Combine starter embeds with dynamic embeds, sorted by creation time
-  const allEmbeds = [...STARTER_EMBEDS, ...dynamicEmbeds].sort((a, b) => b.createdAt - a.createdAt);
+  // Combine starter embeds with dynamic embeds, with dynamic embeds always on top
+  const allEmbeds = [...dynamicEmbeds, ...STARTER_EMBEDS].sort((a, b) => {
+    // If both are dynamic embeds, sort by creation time (newest first)
+    const aIsDynamic = dynamicEmbeds.some(e => e.id === a.id);
+    const bIsDynamic = dynamicEmbeds.some(e => e.id === b.id);
+    
+    if (aIsDynamic && bIsDynamic) {
+      return b.createdAt - a.createdAt;
+    }
+    // If one is dynamic and one is starter, dynamic comes first
+    if (aIsDynamic && !bIsDynamic) return -1;
+    if (!aIsDynamic && bIsDynamic) return 1;
+    // If both are starter embeds, sort by creation time
+    return b.createdAt - a.createdAt;
+  });
 
   /** Renders individual clip card with thumbnail, play overlay, and delete button */
   const renderClipCard = ({ item: embed }: { item: EmbedData }) => {
-    const isNewlyShared = dynamicEmbeds.some(e => e.id === embed.id);
+    // Only show new tag for the most recently created dynamic embed
+    const isMostRecent = dynamicEmbeds.length > 0 && 
+      dynamicEmbeds[dynamicEmbeds.length - 1].id === embed.id;
     const isJustCreated = hasShareIntent && shareIntent.webUrl && 
       shareIntent.webUrl === embed.url;
     
@@ -550,7 +572,7 @@ export default function EmbedsScreen() {
             </View>
             
             {/* Badges */}
-            {isNewlyShared && (
+            {isMostRecent && (
               <View style={styles.badgeContainer}>
                 <Text style={styles.newBadge}>🆕</Text>
               </View>
@@ -593,22 +615,34 @@ export default function EmbedsScreen() {
       <Text style={styles.title}>Saved Clips</Text>
       
       {/* Share Intent Status */}
-      {hasShareIntent && shareIntent.webUrl && (
-        <View style={styles.shareStatus}>
-          <Text style={styles.shareStatusText}>
-            🎬 New clip created successfully!
-          </Text>
-          <Text style={styles.shareStatusSubtext}>
-            Tap on the clip card below to view it
-          </Text>
-          <TouchableOpacity 
-            style={styles.clearButton}
-            onPress={() => resetShareIntent()}
-          >
-            <Text style={styles.clearButtonText}>Clear</Text>
-          </TouchableOpacity>
-        </View>
-      )}
+      {showShareBanner && shareIntent.webUrl && (() => {
+        // Determine platform from the shared URL
+        let platform = 'Unknown';
+        if (shareIntent.webUrl.includes('instagram.com')) {
+          platform = 'Instagram';
+        } else if (shareIntent.webUrl.includes('youtube.com') || shareIntent.webUrl.includes('youtu.be')) {
+          platform = 'YouTube';
+        } else if (shareIntent.webUrl.includes('tiktok.com') || shareIntent.webUrl.includes('vt.tiktok.com')) {
+          platform = 'TikTok';
+        }
+        
+        return (
+          <View style={styles.shareStatus}>
+            <Text style={styles.shareStatusText}>
+              🎬 New clip added from {platform}
+            </Text>
+            <TouchableOpacity 
+              style={styles.clearButton}
+              onPress={() => {
+                setShowShareBanner(false);
+                resetShareIntent();
+              }}
+            >
+              <Text style={styles.clearButtonText}>Clear</Text>
+            </TouchableOpacity>
+          </View>
+        );
+      })()}vm use 
       
       {isLoading ? (
         <Text style={styles.loadingText}>Loading clips...</Text>
