@@ -15,9 +15,9 @@ import React from 'react';
 import { FlatList, Image, Text, TouchableOpacity, View } from 'react-native';
 import { WebView } from 'react-native-webview';
 
-import { STARTER_EMBEDS, STORAGE_KEYS } from './constants';
-import { styles } from './styles';
-import { EmbedData, Provider } from './types';
+import { STARTER_EMBEDS, STORAGE_KEYS } from '../../src/embeds/constants';
+import { styles } from '../../src/embeds/styles';
+import { EmbedData, Provider } from '../../src/embeds/types';
 
 // ============================================================================
 // HTML Generation Utilities
@@ -173,7 +173,9 @@ const parseYouTubeUrl = (url: string): { videoId: string } | null => {
   // YouTube URL patterns:
   // https://www.youtube.com/watch?v=VIDEO_ID
   // https://youtu.be/VIDEO_ID
-  const youtubeRegex = /(?:https?:\/\/(?:www\.)?youtube\.com\/watch\?v=|https?:\/\/youtu\.be\/)([^&\n?#]+)/;
+  // https://youtube.com/shorts/VIDEO_ID (YouTube Shorts)
+  // https://www.youtube.com/shorts/VIDEO_ID (YouTube Shorts)
+  const youtubeRegex = /(?:https?:\/\/(?:www\.)?youtube\.com\/(?:watch\?v=|shorts\/)|https?:\/\/youtu\.be\/)([^&\n?#]+)/;
   const match = url.match(youtubeRegex);
   
   if (match) {
@@ -227,10 +229,11 @@ const createEmbedFromUrl = (url: string): EmbedData | null => {
   // Try YouTube
   const youtubeData = parseYouTubeUrl(url);
   if (youtubeData) {
+    const isShorts = url.includes('/shorts/');
     return {
       id: `youtube-${youtubeData.videoId}-${Date.now()}`,
       type: 'youtube',
-      title: 'YouTube Video',
+      title: isShorts ? 'YouTube Short' : 'YouTube Video',
       subtitle: `Open ${youtubeData.videoId}`,
       url: url,
       videoId: youtubeData.videoId,
