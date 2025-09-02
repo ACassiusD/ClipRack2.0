@@ -2,7 +2,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useShareIntentContext } from 'expo-share-intent';
 import { StatusBar } from 'expo-status-bar';
 import React from 'react';
-import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Dimensions, FlatList, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { WebView } from 'react-native-webview';
 
 type Provider = 'menu' | 'youtube' | 'tiktok' | 'instagram';
@@ -126,6 +126,29 @@ const getBaseUrl = (type: 'youtube' | 'tiktok' | 'instagram'): string => {
   }
 };
 
+// Get thumbnail URL for each platform
+const getThumbnailUrl = (embed: EmbedData): string | null => {
+  switch (embed.type) {
+    case 'youtube':
+      if (embed.videoId) {
+        return `https://img.youtube.com/vi/${embed.videoId}/hqdefault.jpg`;
+      }
+      break;
+    case 'tiktok':
+      // TikTok doesn't have a simple thumbnail API, we'll use a placeholder
+      return null;
+    case 'instagram':
+      // Instagram doesn't have a simple thumbnail API, we'll use a placeholder
+      return null;
+  }
+  return null;
+};
+
+// Get screen dimensions for grid layout
+const { width: screenWidth } = Dimensions.get('window');
+const cardWidth = (screenWidth - 60) / 2; // 2 columns with padding
+const cardHeight = cardWidth * 1.77; // 9:16 aspect ratio
+
 // URL parsing utilities
 const parseInstagramUrl = (url: string): { postId: string; username?: string; contentType: 'post' | 'reel' } | null => {
   // Instagram URL patterns:
@@ -186,12 +209,18 @@ const createEmbedFromUrl = (url: string): EmbedData | null => {
   const instagramData = parseInstagramUrl(url);
   if (instagramData) {
     const contentType = instagramData.contentType === 'reel' ? 'Reel' : 'Post';
+    
+    // Convert reel URLs to post format for consistency
+    const cleanUrl = instagramData.contentType === 'reel' 
+      ? `https://www.instagram.com/p/${instagramData.postId}/`
+      : url;
+    
     return {
       id: `instagram-${instagramData.postId}-${Date.now()}`,
       type: 'instagram',
       title: `Instagram ${contentType}`,
       subtitle: instagramData.username ? `@${instagramData.username}` : instagramData.postId,
-      url: url,
+      url: cleanUrl, // Use the cleaned URL
       postId: instagramData.postId,
       username: instagramData.username,
       createdAt: Date.now()
@@ -317,12 +346,117 @@ export default function EmbedsScreen() {
   // Combine starter embeds with dynamic embeds, sorted by creation time
   const allEmbeds = [...STARTER_EMBEDS, ...dynamicEmbeds].sort((a, b) => b.createdAt - a.createdAt);
 
+  const renderClipCard = ({ item: embed }: { item: EmbedData }) => {
+    const isNewlyShared = dynamicEmbeds.some(e => e.id === embed.id);
+    const isJustCreated = hasShareIntent && shareIntent.webUrl && 
+      createEmbedFromUrl(shareIntent.webUrl)?.url === embed.url;
+    const thumbnailUrl = getThumbnailUrl(embed);
+    
+    return (
+      <View style={styles.gridCard}>
+        <TouchableOpacity 
+          style={styles.cardTouchable}
+          onPress={() => {
+            setSelectedEmbed(embed);
+            setActive(embed.type);
+          }}
+        >
+          {/* Thumbnail Container */}
+          <View style={styles.thumbnailContainer}>
+            {embed.type === 'instagram' ? (
+              // Instagram: Use actual embed preview like your Next.js example
+              <WebView
+                source={{ 
+                  uri: `${embed.url.replace(/\/$/, '')}/embed`,
+                  headers: {
+                    'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 14_0 like Mac OS X) AppleWebKit/605.1.15'
+                  }
+                }}
+                style={styles.thumbnail}
+                scrollEnabled={false}
+                showsHorizontalScrollIndicator={false}
+                showsVerticalScrollIndicator={false}
+                javaScriptEnabled={true}
+                domStorageEnabled={true}
+                allowsInlineMediaPlayback={false}
+                mediaPlaybackRequiresUserAction={true}
+                allowsFullscreenVideo={false}
+                onLoadStart={() => {
+                  console.log('🔄 Instagram embed loading:', embed.url);
+                }}
+                onLoadEnd={() => {
+                  console.log('✅ Instagram embed loaded successfully');
+                }}
+                onError={(syntheticEvent) => {
+                  console.log('❌ Instagram embed error:', syntheticEvent.nativeEvent);
+                }}
+                onHttpError={(syntheticEvent) => {
+                  console.log('🌐 Instagram embed HTTP error:', syntheticEvent.nativeEvent);
+                }}
+              />
+            ) : thumbnailUrl ? (
+              // YouTube: Use thumbnail image
+              <Image 
+                source={{ uri: thumbnailUrl }} 
+                style={styles.thumbnail}
+                resizeMode="cover"
+              />
+            ) : (
+              // TikTok: Show placeholder for now
+              <View style={[styles.thumbnail, styles.placeholderThumbnail]}>
+                <Text style={styles.placeholderText}>
+                  {embed.type.toUpperCase()}
+                </Text>
+              </View>
+            )}
+            
+            {/* Play Overlay */}
+            <View style={styles.playOverlay}>
+              <View style={styles.playButton}>
+                <Text style={styles.playIcon}>▶</Text>
+              </View>
+            </View>
+            
+            {/* Badges */}
+            {isNewlyShared && (
+              <View style={styles.badgeContainer}>
+                <Text style={styles.newBadge}>🆕</Text>
+              </View>
+            )}
+            {isJustCreated && (
+              <View style={styles.badgeContainer}>
+                <Text style={styles.justAddedBadge}>✨</Text>
+              </View>
+            )}
+          </View>
+          
+          {/* Card Info */}
+          <View style={styles.cardInfo}>
+            <Text style={styles.cardTitle} numberOfLines={2}>
+              {embed.title}
+            </Text>
+            <Text style={styles.cardSubtitle} numberOfLines={1}>
+              {embed.subtitle}
+            </Text>
+            <Text style={styles.cardPlatform}>
+              {embed.type} • {embed.type === 'youtube' ? 'YouTube' : embed.type === 'tiktok' ? 'TikTok' : 'Instagram'}
+            </Text>
+          </View>
+        </TouchableOpacity>
+        
+        {/* Delete Button */}
+        <TouchableOpacity 
+          style={styles.deleteButton}
+          onPress={() => deleteEmbed(embed.id)}
+        >
+          <Text style={styles.deleteButtonText}>🗑️</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  };
+
   const renderMenu = () => (
-    <ScrollView 
-      style={styles.menuContainer} 
-      showsVerticalScrollIndicator={false}
-      contentContainerStyle={styles.scrollContent}
-    >
+    <View style={styles.menuContainer}>
       <Text style={styles.title}>All Saved Clips</Text>
       
       {/* Share Intent Status */}
@@ -345,57 +479,22 @@ export default function EmbedsScreen() {
       
       {isLoading ? (
         <Text style={styles.loadingText}>Loading clips...</Text>
+      ) : allEmbeds.length > 0 ? (
+        <FlatList
+          data={allEmbeds}
+          renderItem={renderClipCard}
+          keyExtractor={(item) => item.id}
+          numColumns={2}
+          columnWrapperStyle={styles.row}
+          contentContainerStyle={styles.gridContent}
+          showsVerticalScrollIndicator={false}
+        />
       ) : (
-        <View style={styles.cards}>
-          {allEmbeds.map((embed) => {
-            const isNewlyShared = dynamicEmbeds.some(e => e.id === embed.id);
-            const isJustCreated = hasShareIntent && shareIntent.webUrl && 
-              createEmbedFromUrl(shareIntent.webUrl)?.url === embed.url;
-            
-            return (
-              <View 
-                key={embed.id}
-                style={[
-                  styles.card,
-                  isNewlyShared && styles.dynamicCard,
-                  isJustCreated && styles.justCreatedCard
-                ]} 
-              >
-                <TouchableOpacity 
-                  style={styles.cardContent}
-                  onPress={() => {
-                    setSelectedEmbed(embed);
-                    setActive(embed.type);
-                  }}
-                >
-                  <Text style={styles.cardTitle}>{embed.title}</Text>
-                  <Text style={styles.cardSubtitle}>{embed.subtitle}</Text>
-                  {isNewlyShared && (
-                    <Text style={styles.dynamicBadge}>🆕 Shared</Text>
-                  )}
-                  {isJustCreated && (
-                    <Text style={styles.justCreatedBadge}>✨ Just Added!</Text>
-                  )}
-                </TouchableOpacity>
-                
-                <TouchableOpacity 
-                  style={styles.deleteButton}
-                  onPress={() => deleteEmbed(embed.id)}
-                >
-                  <Text style={styles.deleteButtonText}>🗑️</Text>
-                </TouchableOpacity>
-              </View>
-            );
-          })}
-        </View>
-      )}
-      
-      {!isLoading && allEmbeds.length === 0 && (
         <Text style={styles.noEmbedsText}>
           No clips available. Share a social media URL from another app to create one!
         </Text>
       )}
-    </ScrollView>
+    </View>
   );
 
   const BackFloating = () => (
@@ -488,7 +587,7 @@ export default function EmbedsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#000',
+    backgroundColor: '#0b0b0c',
   },
   webview: {
     flex: 1,
@@ -499,13 +598,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingTop: 80,
   },
-  scrollContent: {
-    paddingBottom: 100, // Add bottom padding to avoid tab bar overlap
-  },
   title: {
-    color: '#fff',
+    color: '#e8e8ea',
     fontSize: 24,
-    fontWeight: '600',
+    fontWeight: '700',
     marginBottom: 16,
     textAlign: 'center',
   },
@@ -545,74 +641,137 @@ const styles = StyleSheet.create({
     fontSize: 10,
     fontWeight: '600',
   },
-  cards: {
-    gap: 12,
+  // Grid Layout Styles
+  gridContent: {
+    paddingBottom: 100, // Add bottom padding to avoid tab bar overlap
   },
-  card: {
-    backgroundColor: '#111',
-    borderRadius: 12,
-    padding: 16,
-    borderWidth: 1,
-    borderColor: '#222',
-    flexDirection: 'row',
-    alignItems: 'center',
+  row: {
     justifyContent: 'space-between',
+    marginBottom: 12,
   },
-  cardContent: {
+  gridCard: {
+    width: cardWidth,
+    backgroundColor: '#0f1013',
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: '#202126',
+    overflow: 'hidden',
+    position: 'relative',
+  },
+  cardTouchable: {
     flex: 1,
   },
-  deleteButton: {
-    backgroundColor: '#ff4444',
-    borderRadius: 8,
-    padding: 8,
-    marginLeft: 12,
-    minWidth: 36,
-    alignItems: 'center',
-    justifyContent: 'center',
+  thumbnailContainer: {
+    position: 'relative',
+    width: '100%',
+    height: cardHeight,
+    backgroundColor: '#000',
   },
-  deleteButtonText: {
-    color: '#fff',
-    fontSize: 16,
+  thumbnail: {
+    width: '100%',
+    height: '100%',
+  },
+  placeholderThumbnail: {
+    backgroundColor: '#1a1b1f',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  placeholderText: {
+    color: '#cfcfd4',
+    fontSize: 18,
     fontWeight: '600',
   },
-  dynamicCard: {
-    borderColor: '#0f0',
-    borderWidth: 2,
+  playOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.45)',
   },
-  justCreatedCard: {
-    borderColor: '#ffd700',
-    borderWidth: 3,
-    backgroundColor: 'rgba(255, 215, 0, 0.1)',
+  playButton: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.2)',
+  },
+  playIcon: {
+    color: '#000',
+    fontSize: 18,
+    marginLeft: 3, // Slight offset to center the triangle
+  },
+  badgeContainer: {
+    position: 'absolute',
+    top: 8,
+    right: 8,
+  },
+  newBadge: {
+    backgroundColor: 'rgba(0, 255, 0, 0.8)',
+    color: '#000',
+    fontSize: 12,
+    fontWeight: '600',
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 4,
+  },
+  justAddedBadge: {
+    backgroundColor: 'rgba(255, 215, 0, 0.8)',
+    color: '#000',
+    fontSize: 12,
+    fontWeight: '600',
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 4,
+  },
+  cardInfo: {
+    padding: 10,
   },
   cardTitle: {
-    color: '#fff',
-    fontSize: 18,
+    color: '#e8e8ea',
+    fontSize: 13,
     fontWeight: '600',
     marginBottom: 4,
   },
   cardSubtitle: {
-    color: '#aaa',
-    fontSize: 14,
+    color: '#b7b8bd',
+    fontSize: 11,
     marginBottom: 4,
   },
-  dynamicBadge: {
-    color: '#0f0',
-    fontSize: 12,
-    fontWeight: '600',
+  cardPlatform: {
+    color: '#9a9ba1',
+    fontSize: 10,
+    textTransform: 'uppercase',
   },
-  justCreatedBadge: {
-    color: '#ffd700',
+  deleteButton: {
+    position: 'absolute',
+    top: 8,
+    left: 8,
+    backgroundColor: 'rgba(255, 68, 68, 0.8)',
+    borderRadius: 12,
+    width: 24,
+    height: 24,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  deleteButtonText: {
+    color: '#fff',
     fontSize: 12,
     fontWeight: '600',
   },
   noEmbedsText: {
-    color: '#666',
+    color: '#9a9ba1',
     fontSize: 16,
     textAlign: 'center',
     marginTop: 40,
   },
   loadingText: {
-    color: '#fff',
+    color: '#e8e8ea',
     fontSize: 18,
     textAlign: 'center',
     marginTop: 40,
