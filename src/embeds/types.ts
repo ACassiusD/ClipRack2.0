@@ -7,6 +7,7 @@ export interface EmbedData {
   videoId?: string;
   username?: string;
   postId?: string;
+  isShortUrl?: boolean; // for TikTok short URLs
   createdAt: number; // timestamp for sorting
 }
 

@@ -66,6 +66,10 @@ const generateInstagramHtml = (postId: string): string => {
 
 /** Main HTML generator - routes to appropriate platform-specific generator */
 const generateEmbedHtml = (embed: EmbedData): string => {
+  if (!embed.type) {
+    return '<html><body><p>Invalid embed data: missing type</p></body></html>';
+  }
+  
   switch (embed.type) {
     case 'youtube':
       if (embed.videoId) {
@@ -99,9 +103,52 @@ const getBaseUrl = (type: 'youtube' | 'tiktok' | 'instagram'): string => {
   }
 };
 
-/** Fetches TikTok thumbnail via oEmbed API with fallback URL construction */
-const fetchTikTokThumbnail = async (videoId: string): Promise<string | null> => {
+/** Resolves TikTok short URL to full format */
+const resolveTikTokShortUrl = async (shortUrl: string): Promise<string | null> => {
   try {
+    console.log('🔄 Resolving TikTok short URL:', shortUrl);
+    
+    // Make a HEAD request to get the redirect URL
+    const response = await fetch(shortUrl, { 
+      method: 'HEAD',
+      redirect: 'manual' // Don't follow redirects automatically
+    });
+    
+    // Check if we got a redirect
+    if (response.status >= 300 && response.status < 400) {
+      const location = response.headers.get('location');
+      if (location) {
+        console.log('✅ Resolved TikTok URL:', location);
+        return location;
+      }
+    }
+    
+    // If no redirect, try a GET request with redirect following
+    const getResponse = await fetch(shortUrl, { redirect: 'follow' });
+    if (getResponse.url !== shortUrl) {
+      console.log('✅ Resolved TikTok URL via GET:', getResponse.url);
+      return getResponse.url;
+    }
+    
+    console.log('❌ Could not resolve TikTok short URL');
+    return null;
+    
+  } catch (error) {
+    console.log('❌ Error resolving TikTok short URL:', error);
+    return null;
+  }
+};
+
+/** Fetches TikTok thumbnail via oEmbed API with fallback URL construction */
+const fetchTikTokThumbnail = async (videoId: string, isShortUrl: boolean = false): Promise<string | null> => {
+  try {
+    if (isShortUrl) {
+      // For short URLs, we can't use oEmbed API directly
+      // Return a placeholder or try to construct a generic thumbnail
+      console.log('🔄 Short TikTok URL detected, using placeholder');
+      return null; // Will fall back to the "TIKTOK" text display
+    }
+    
     // Try TikTok's oEmbed API first
     const oembedUrl = `https://www.tiktok.com/oembed?url=https://www.tiktok.com/@username/video/${videoId}`;
     const response = await fetch(oembedUrl);
@@ -128,6 +175,10 @@ const fetchTikTokThumbnail = async (videoId: string): Promise<string | null> => 
 
 /** Returns thumbnail URL for YouTube, null for others (handled separately) */
 const getThumbnailUrl = (embed: EmbedData): string | null => {
+  if (!embed.type) {
+    return null;
+  }
+  
   switch (embed.type) {
     case 'youtube':
       if (embed.videoId) {
@@ -186,24 +237,32 @@ const parseYouTubeUrl = (url: string): { videoId: string } | null => {
 };
 
 /** Parses TikTok URLs and extracts video ID and username */
-const parseTikTokUrl = (url: string): { postId: string; username?: string } | null => {
+const parseTikTokUrl = (url: string): { postId: string; username?: string; isShortUrl?: boolean } | null => {
   // TikTok URL patterns:
-  // https://www.tiktok.com/@username/video/POST_ID
-  // https://tiktok.com/@username/video/POST_ID
-  const tiktokRegex = /(?:https?:\/\/(?:www\.)?tiktok\.com\/@([^\/]+)\/video\/([^\/\?]+))/;
-  const match = url.match(tiktokRegex);
+  // https://www.tiktok.com/@username/video/POST_ID (full format)
+  // https://tiktok.com/@username/video/POST_ID (full format)
+  // https://vt.tiktok.com/SHORT_ID (shortened format)
+  const fullTiktokRegex = /(?:https?:\/\/(?:www\.)?tiktok\.com\/@([^\/]+)\/video\/([^\/\?]+))/;
+  const shortTiktokRegex = /(?:https?:\/\/vt\.tiktok\.com\/([^\/\?]+))/;
   
-  if (match) {
-    const username = match[1];
-    const postId = match[2];
+  const fullMatch = url.match(fullTiktokRegex);
+  if (fullMatch) {
+    const username = fullMatch[1];
+    const postId = fullMatch[2];
     return { postId, username };
+  }
+  
+  const shortMatch = url.match(shortTiktokRegex);
+  if (shortMatch) {
+    const shortId = shortMatch[1];
+    return { postId: shortId, isShortUrl: true };
   }
   
   return null;
 };
 
 /** Creates EmbedData object from shared URL, converts reel URLs to post format */
-const createEmbedFromUrl = (url: string): EmbedData | null => {
+const createEmbedFromUrl = async (url: string): Promise<EmbedData | null> => {
   // Try Instagram first
   const instagramData = parseInstagramUrl(url);
   if (instagramData) {
@@ -244,14 +303,36 @@ const createEmbedFromUrl = (url: string): EmbedData | null => {
   // Try TikTok
   const tiktokData = parseTikTokUrl(url);
   if (tiktokData) {
+    let finalUrl = url;
+    let finalPostId = tiktokData.postId;
+    let finalUsername = tiktokData.username;
+    let isShortUrl = tiktokData.isShortUrl;
+    
+    // If it's a short URL, try to resolve it
+    if (tiktokData.isShortUrl) {
+      const resolvedUrl = await resolveTikTokShortUrl(url);
+      if (resolvedUrl) {
+        // Parse the resolved URL to get the full format data
+        const resolvedData = parseTikTokUrl(resolvedUrl);
+        if (resolvedData && !resolvedData.isShortUrl) {
+          finalUrl = resolvedUrl;
+          finalPostId = resolvedData.postId;
+          finalUsername = resolvedData.username;
+          isShortUrl = false;
+          console.log('✅ Successfully resolved TikTok short URL to full format');
+        }
+      }
+    }
+    
     return {
-      id: `tiktok-${tiktokData.postId}-${Date.now()}`,
+      id: `tiktok-${finalPostId}-${Date.now()}`,
       type: 'tiktok',
       title: 'TikTok Video',
-      subtitle: tiktokData.username ? `@${tiktokData.username}` : tiktokData.postId,
-      url: url,
-      postId: tiktokData.postId,
-      username: tiktokData.username,
+      subtitle: finalUsername ? `@${finalUsername}` : (isShortUrl ? 'Short URL' : finalPostId),
+      url: finalUrl,
+      postId: finalPostId,
+      username: finalUsername,
+      isShortUrl: isShortUrl,
       createdAt: Date.now()
     };
   }
@@ -317,7 +398,7 @@ export default function EmbedsScreen() {
       for (const embed of tiktokEmbeds) {
         if (embed.postId && !tiktokThumbnails[embed.postId]) {
           console.log('🔄 Fetching TikTok thumbnail for:', embed.postId);
-          const thumbnailUrl = await fetchTikTokThumbnail(embed.postId);
+          const thumbnailUrl = await fetchTikTokThumbnail(embed.postId, embed.isShortUrl);
           if (thumbnailUrl) {
             setTiktokThumbnails(prev => ({
               ...prev,
@@ -350,31 +431,35 @@ export default function EmbedsScreen() {
     if (hasShareIntent && shareIntent.webUrl) {
       console.log('🔄 Processing shared URL:', shareIntent.webUrl);
       
-      const embed = createEmbedFromUrl(shareIntent.webUrl);
-      console.log('🎬 Created embed object:', embed);
-      
-      if (embed) {
-        // Check if this embed already exists (by URL, not ID since ID includes timestamp)
-        const exists = dynamicEmbeds.some(e => e.url === embed.url);
-        console.log('🔍 Embed already exists:', exists);
+      const processShareIntent = async () => {
+        const embed = await createEmbedFromUrl(shareIntent.webUrl!);
+        console.log('🎬 Created embed object:', embed);
         
-        if (!exists) {
-          const newEmbeds = [...dynamicEmbeds, embed];
-          setDynamicEmbeds(newEmbeds);
+        if (embed) {
+          // Check if this embed already exists (by URL, not ID since ID includes timestamp)
+          const exists = dynamicEmbeds.some(e => e.url === embed.url);
+          console.log('🔍 Embed already exists:', exists);
           
-          // Save to AsyncStorage
-          saveDynamicEmbeds(newEmbeds);
-          console.log('💾 Saved embed to storage');
-          
-          // Don't automatically show the clip - just stay on the clips list
-          // User can tap on the new clip card to view it
-          console.log('💾 Clip created and saved - staying on clips list');
+          if (!exists) {
+            const newEmbeds = [...dynamicEmbeds, embed];
+            setDynamicEmbeds(newEmbeds);
+            
+            // Save to AsyncStorage
+            saveDynamicEmbeds(newEmbeds);
+            console.log('💾 Saved embed to storage');
+            
+            // Don't automatically show the clip - just stay on the clips list
+            // User can tap on the new clip card to view it
+            console.log('💾 Clip created and saved - staying on clips list');
+          } else {
+            console.log('🔍 Clip already exists - staying on clips list');
+          }
         } else {
-          console.log('🔍 Clip already exists - staying on clips list');
+          console.log('❌ Failed to create embed from URL');
         }
-      } else {
-        console.log('❌ Failed to create embed from URL');
-      }
+      };
+      
+      processShareIntent();
     }
   }, [hasShareIntent, shareIntent.webUrl, dynamicEmbeds]);
 
@@ -385,7 +470,7 @@ export default function EmbedsScreen() {
   const renderClipCard = ({ item: embed }: { item: EmbedData }) => {
     const isNewlyShared = dynamicEmbeds.some(e => e.id === embed.id);
     const isJustCreated = hasShareIntent && shareIntent.webUrl && 
-      createEmbedFromUrl(shareIntent.webUrl)?.url === embed.url;
+      shareIntent.webUrl === embed.url;
     
     // Get thumbnail URL based on platform
     let thumbnailUrl = getThumbnailUrl(embed);
@@ -399,7 +484,7 @@ export default function EmbedsScreen() {
           style={styles.cardTouchable}
           onPress={() => {
             setSelectedEmbed(embed);
-            setActive(embed.type);
+            setActive(embed.type || 'menu');
           }}
         >
           {/* Thumbnail Container */}
@@ -452,7 +537,7 @@ export default function EmbedsScreen() {
               // Fallback: Show placeholder
               <View style={[styles.thumbnail, styles.placeholderThumbnail]}>
                 <Text style={styles.placeholderText}>
-                  {embed.type.toUpperCase()}
+                  {embed.type?.toUpperCase() || 'CLIP'}
                 </Text>
               </View>
             )}
@@ -486,7 +571,7 @@ export default function EmbedsScreen() {
               {embed.subtitle}
             </Text>
             <Text style={styles.cardPlatform}>
-              {embed.type} • {embed.type === 'youtube' ? 'YouTube' : embed.type === 'tiktok' ? 'TikTok' : 'Instagram'}
+              {embed.type || 'unknown'} • {embed.type === 'youtube' ? 'YouTube' : embed.type === 'tiktok' ? 'TikTok' : embed.type === 'instagram' ? 'Instagram' : 'Unknown'}
             </Text>
           </View>
         </TouchableOpacity>
@@ -505,7 +590,7 @@ export default function EmbedsScreen() {
   /** Renders main grid view with all clips */
   const renderMenu = () => (
     <View style={styles.menuContainer}>
-      <Text style={styles.title}>All Saved Clips</Text>
+      <Text style={styles.title}>Saved Clips</Text>
       
       {/* Share Intent Status */}
       {hasShareIntent && shareIntent.webUrl && (
