@@ -377,6 +377,8 @@ export default function EmbedsScreen() {
   const [isLoading, setIsLoading] = React.useState(true);
   const [tiktokThumbnails, setTiktokThumbnails] = React.useState<Record<string, string>>({});
   const [showShareBanner, setShowShareBanner] = React.useState(false);
+  const [showFilterPage, setShowFilterPage] = React.useState(false);
+  const [selectedSites, setSelectedSites] = React.useState<Set<string>>(new Set(['youtube', 'tiktok', 'instagram']));
   
   const { hasShareIntent, shareIntent, resetShareIntent } = useShareIntentContext();
 
@@ -470,21 +472,23 @@ export default function EmbedsScreen() {
     }
   }, [hasShareIntent, shareIntent.webUrl, dynamicEmbeds]);
 
-  // Combine starter embeds with dynamic embeds, with dynamic embeds always on top
-  const allEmbeds = [...dynamicEmbeds, ...STARTER_EMBEDS].sort((a, b) => {
-    // If both are dynamic embeds, sort by creation time (newest first)
-    const aIsDynamic = dynamicEmbeds.some(e => e.id === a.id);
-    const bIsDynamic = dynamicEmbeds.some(e => e.id === b.id);
-    
-    if (aIsDynamic && bIsDynamic) {
+  // Combine starter embeds with dynamic embeds, with dynamic embeds always on top, then apply filters
+  const allEmbeds = [...dynamicEmbeds, ...STARTER_EMBEDS]
+    .filter(embed => selectedSites.has(embed.type || ''))
+    .sort((a, b) => {
+      // If both are dynamic embeds, sort by creation time (newest first)
+      const aIsDynamic = dynamicEmbeds.some(e => e.id === a.id);
+      const bIsDynamic = dynamicEmbeds.some(e => e.id === b.id);
+      
+      if (aIsDynamic && bIsDynamic) {
+        return b.createdAt - a.createdAt;
+      }
+      // If one is dynamic and one is starter, dynamic comes first
+      if (aIsDynamic && !bIsDynamic) return -1;
+      if (!aIsDynamic && bIsDynamic) return 1;
+      // If both are starter embeds, sort by creation time
       return b.createdAt - a.createdAt;
-    }
-    // If one is dynamic and one is starter, dynamic comes first
-    if (aIsDynamic && !bIsDynamic) return -1;
-    if (!aIsDynamic && bIsDynamic) return 1;
-    // If both are starter embeds, sort by creation time
-    return b.createdAt - a.createdAt;
-  });
+    });
 
   /** Renders individual clip card with thumbnail, play overlay, and delete button */
   const renderClipCard = ({ item: embed }: { item: EmbedData }) => {
@@ -612,7 +616,15 @@ export default function EmbedsScreen() {
   /** Renders main grid view with all clips */
   const renderMenu = () => (
     <View style={styles.menuContainer}>
-      <Text style={styles.title}>Saved Clips</Text>
+      <View style={styles.titleRow}>
+        <Text style={styles.title}>Saved Clips</Text>
+        <TouchableOpacity 
+          style={styles.filterButton}
+          onPress={() => setShowFilterPage(true)}
+        >
+          <Text style={styles.filterButtonText}>🔍</Text>
+        </TouchableOpacity>
+      </View>
       
       {/* Share Intent Status */}
       {showShareBanner && shareIntent.webUrl && (() => {
@@ -642,7 +654,7 @@ export default function EmbedsScreen() {
             </TouchableOpacity>
           </View>
         );
-      })()}vm use 
+      })()}
       
       {isLoading ? (
         <Text style={styles.loadingText}>Loading clips...</Text>
@@ -673,6 +685,76 @@ export default function EmbedsScreen() {
       <Text style={styles.backButtonText}>←</Text>
     </TouchableOpacity>
   );
+
+  /** Renders filter page */
+  const renderFilterPage = () => {
+    const sites = [
+      { key: 'youtube', label: 'YouTube', icon: '📺' },
+      { key: 'tiktok', label: 'TikTok', icon: '🎵' },
+      { key: 'instagram', label: 'Instagram', icon: '📷' }
+    ];
+
+    const toggleSite = (siteKey: string) => {
+      const newSelectedSites = new Set(selectedSites);
+      if (newSelectedSites.has(siteKey)) {
+        newSelectedSites.delete(siteKey);
+      } else {
+        newSelectedSites.add(siteKey);
+      }
+      setSelectedSites(newSelectedSites);
+    };
+
+    return (
+      <View style={styles.container}>
+        <StatusBar style="light" />
+        <View style={{ flex: 1, paddingHorizontal: 20, paddingTop: 80 }}>
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 32 }}>
+            <TouchableOpacity 
+              style={styles.backButton}
+              onPress={() => setShowFilterPage(false)}
+            >
+              <Text style={styles.backButtonText}>←</Text>
+            </TouchableOpacity>
+            <Text style={{ color: '#e8e8ea', fontSize: 24, fontWeight: '700', flex: 1, textAlign: 'center' }}>Filter Clips</Text>
+            <View style={{ width: 40 }} />
+          </View>
+          
+          <View style={{ marginBottom: 24 }}>
+            <Text style={{ color: '#e8e8ea', fontSize: 18, fontWeight: '600', marginBottom: 16 }}>Sites</Text>
+            {sites.map(site => (
+              <TouchableOpacity
+                key={site.key}
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  backgroundColor: selectedSites.has(site.key) ? 'rgba(0, 123, 255, 0.1)' : '#0f1013',
+                  borderRadius: 12,
+                  padding: 16,
+                  marginBottom: 8,
+                  borderWidth: 1,
+                  borderColor: selectedSites.has(site.key) ? 'rgba(0, 123, 255, 0.3)' : '#202126',
+                }}
+                onPress={() => toggleSite(site.key)}
+              >
+                <Text style={{ fontSize: 20, marginRight: 12 }}>{site.icon}</Text>
+                <Text style={{
+                  color: selectedSites.has(site.key) ? '#007bff' : '#e8e8ea',
+                  fontSize: 16,
+                  fontWeight: selectedSites.has(site.key) ? '600' : '500',
+                  flex: 1,
+                }}>
+                  {site.label}
+                </Text>
+                {selectedSites.has(site.key) && (
+                  <Text style={{ color: '#007bff', fontSize: 18, fontWeight: '600' }}>✓</Text>
+                )}
+              </TouchableOpacity>
+            ))}
+          </View>
+        </View>
+      </View>
+    );
+  };
 
   /** Renders WebView for playing selected embed with error handling */
   const renderWebView = () => {
@@ -742,6 +824,10 @@ export default function EmbedsScreen() {
       );
     }
   };
+
+  if (showFilterPage) {
+    return renderFilterPage();
+  }
 
   return active === 'menu' ? (
     <View style={styles.container}>
