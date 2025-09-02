@@ -639,7 +639,7 @@ export default function EmbedsScreen() {
             setShowFilterPage(true);
           }}
         >
-          <Text style={styles.filterButtonText}>⚙</Text>
+          <Text style={styles.filterButtonText}>⋮</Text>
         </TouchableOpacity>
       </View>
       
