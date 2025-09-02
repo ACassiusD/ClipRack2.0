@@ -716,9 +716,9 @@ export default function EmbedsScreen() {
   /** Renders filter page */
   const renderFilterPage = () => {
     const sites = [
-      { key: 'youtube', label: 'YouTube', icon: '▶' },
-      { key: 'tiktok', label: 'TikTok', icon: '♪' },
-      { key: 'instagram', label: 'Instagram', icon: '◉' }
+      { key: 'youtube', label: 'YouTube', icon: '📺', color: '#FF0000' },
+      { key: 'tiktok', label: 'TikTok', icon: '🎵', color: '#000000' },
+      { key: 'instagram', label: 'Instagram', icon: '📷', color: '#E4405F' }
     ];
 
     const toggleSite = (siteKey: string) => {
@@ -734,55 +734,47 @@ export default function EmbedsScreen() {
       setSelectedSites(newSelectedSites);
     };
 
+    const ToggleSwitch = ({ isActive }: { isActive: boolean }) => (
+      <View style={[styles.toggleSwitch, isActive && styles.toggleSwitchActive]}>
+        <View style={[styles.toggleThumb, isActive && styles.toggleThumbActive]} />
+      </View>
+    );
+
     return (
       <View style={styles.container}>
         <StatusBar style="light" />
-        <View style={{ flex: 1, paddingHorizontal: 20, paddingTop: 100 }}>
-          <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 32 }}>
+        <View style={styles.filterContainer}>
+          <View style={styles.filterHeader}>
             <TouchableOpacity 
-              style={styles.backButton}
+              style={styles.filterBackButton}
               onPress={() => {
                 Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                 setShowFilterPage(false);
               }}
             >
-              <Text style={styles.backButtonText}>‹</Text>
+              <Text style={styles.filterBackButtonText}>‹</Text>
             </TouchableOpacity>
-            <Text style={{ color: '#e8e8ea', fontSize: 24, fontWeight: '700', flex: 1, textAlign: 'center' }}>Filter Clips</Text>
-            <View style={{ width: 40 }} />
+            <Text style={styles.filterTitle}>Filter Clips</Text>
           </View>
           
-          <View style={{ marginBottom: 24 }}>
-            <Text style={{ color: '#e8e8ea', fontSize: 18, fontWeight: '600', marginBottom: 16 }}>Sites</Text>
-            {sites.map(site => (
-              <TouchableOpacity
-                key={site.key}
-                style={{
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  backgroundColor: selectedSites.has(site.key) ? 'rgba(0, 123, 255, 0.1)' : '#0f1013',
-                  borderRadius: 12,
-                  padding: 16,
-                  marginBottom: 8,
-                  borderWidth: 1,
-                  borderColor: selectedSites.has(site.key) ? 'rgba(0, 123, 255, 0.3)' : '#202126',
-                }}
-                onPress={() => toggleSite(site.key)}
-              >
-                <Text style={{ fontSize: 20, marginRight: 12 }}>{site.icon}</Text>
-                <Text style={{
-                  color: selectedSites.has(site.key) ? '#007bff' : '#e8e8ea',
-                  fontSize: 16,
-                  fontWeight: selectedSites.has(site.key) ? '600' : '500',
-                  flex: 1,
-                }}>
-                  {site.label}
-                </Text>
-                {selectedSites.has(site.key) && (
-                  <Text style={{ color: '#007bff', fontSize: 18, fontWeight: '600' }}>●</Text>
-                )}
-              </TouchableOpacity>
-            ))}
+          <View style={styles.filterSection}>
+            <Text style={styles.filterSectionTitle}>Platforms</Text>
+            {sites.map(site => {
+              const isSelected = selectedSites.has(site.key);
+              return (
+                <TouchableOpacity
+                  key={site.key}
+                  style={[styles.filterOption, isSelected && styles.filterOptionSelected]}
+                  onPress={() => toggleSite(site.key)}
+                >
+                  <Text style={[styles.filterOptionIcon, { color: site.color }]}>{site.icon}</Text>
+                  <Text style={[styles.filterOptionText, isSelected && styles.filterOptionTextSelected]}>
+                    {site.label}
+                  </Text>
+                  <ToggleSwitch isActive={isSelected} />
+                </TouchableOpacity>
+              );
+            })}
           </View>
         </View>
       </View>
