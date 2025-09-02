@@ -1,3 +1,13 @@
+/**
+ * EmbedsScreen - Main component for displaying and managing social media clips
+ * 
+ * Features:
+ * - Grid layout of video clips (YouTube, TikTok, Instagram)
+ * - Share intent integration for adding new clips
+ * - Thumbnail previews and embed playback
+ * - Persistent storage with AsyncStorage
+ * - Delete functionality for individual clips
+ */
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useShareIntentContext } from 'expo-share-intent';
 import { StatusBar } from 'expo-status-bar';
@@ -9,7 +19,11 @@ import { STARTER_EMBEDS, STORAGE_KEYS } from './constants';
 import { styles } from './styles';
 import { EmbedData, Provider } from './types';
 
-// Utility functions to generate HTML programmatically
+// ============================================================================
+// HTML Generation Utilities
+// ============================================================================
+
+/** Generates YouTube embed HTML with responsive iframe */
 const generateYouTubeHtml = (videoId: string): string => {
   const embedUrl = `https://www.youtube.com/embed/${videoId}?playsinline=1&modestbranding=1&rel=0`;
   return `<!DOCTYPE html><html><head><meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -22,6 +36,7 @@ const generateYouTubeHtml = (videoId: string): string => {
   </body></html>`;
 };
 
+/** Generates TikTok embed HTML using TikTok's embed script */
 const generateTikTokHtml = (postId: string): string => {
   return `<!DOCTYPE html><html><head><meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>html,body{margin:0;padding:0;background:#000;} .wrap{display:flex;align-items:center;justify-content:center;min-height:100vh;}
@@ -36,6 +51,7 @@ const generateTikTokHtml = (postId: string): string => {
   </body></html>`;
 };
 
+/** Generates Instagram embed HTML using Instagram's embed script */
 const generateInstagramHtml = (postId: string): string => {
   return `<!DOCTYPE html><html><head><meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>html,body{margin:0;padding:0;background:#000;} .wrap{display:flex;align-items:center;justify-content:center;min-height:100vh;}
@@ -48,7 +64,7 @@ const generateInstagramHtml = (postId: string): string => {
   </body></html>`;
 };
 
-// Main function to generate HTML based on embed type and data
+/** Main HTML generator - routes to appropriate platform-specific generator */
 const generateEmbedHtml = (embed: EmbedData): string => {
   switch (embed.type) {
     case 'youtube':
@@ -70,7 +86,11 @@ const generateEmbedHtml = (embed: EmbedData): string => {
   return '<html><body><p>Invalid embed data</p></body></html>';
 };
 
-// Get base URL for each platform
+// ============================================================================
+// URL Parsing & Thumbnail Utilities
+// ============================================================================
+
+/** Returns base URL for WebView origin whitelist */
 const getBaseUrl = (type: 'youtube' | 'tiktok' | 'instagram'): string => {
   switch (type) {
     case 'youtube': return 'https://www.youtube.com';
@@ -79,7 +99,7 @@ const getBaseUrl = (type: 'youtube' | 'tiktok' | 'instagram'): string => {
   }
 };
 
-// TikTok thumbnail fetching function
+/** Fetches TikTok thumbnail via oEmbed API with fallback URL construction */
 const fetchTikTokThumbnail = async (videoId: string): Promise<string | null> => {
   try {
     // Try TikTok's oEmbed API first
@@ -106,7 +126,7 @@ const fetchTikTokThumbnail = async (videoId: string): Promise<string | null> => 
   }
 };
 
-// Get thumbnail URL for each platform
+/** Returns thumbnail URL for YouTube, null for others (handled separately) */
 const getThumbnailUrl = (embed: EmbedData): string | null => {
   switch (embed.type) {
     case 'youtube':
@@ -124,9 +144,7 @@ const getThumbnailUrl = (embed: EmbedData): string | null => {
   return null;
 };
 
-
-
-// URL parsing utilities
+/** Parses Instagram URLs (posts/reels) and extracts post ID, username, and content type */
 const parseInstagramUrl = (url: string): { postId: string; username?: string; contentType: 'post' | 'reel' } | null => {
   // Instagram URL patterns:
   // https://www.instagram.com/p/POST_ID/ (posts)
@@ -150,6 +168,7 @@ const parseInstagramUrl = (url: string): { postId: string; username?: string; co
   return null;
 };
 
+/** Parses YouTube URLs and extracts video ID */
 const parseYouTubeUrl = (url: string): { videoId: string } | null => {
   // YouTube URL patterns:
   // https://www.youtube.com/watch?v=VIDEO_ID
@@ -164,6 +183,7 @@ const parseYouTubeUrl = (url: string): { videoId: string } | null => {
   return null;
 };
 
+/** Parses TikTok URLs and extracts video ID and username */
 const parseTikTokUrl = (url: string): { postId: string; username?: string } | null => {
   // TikTok URL patterns:
   // https://www.tiktok.com/@username/video/POST_ID
@@ -180,7 +200,7 @@ const parseTikTokUrl = (url: string): { postId: string; username?: string } | nu
   return null;
 };
 
-// Create embed data from URL
+/** Creates EmbedData object from shared URL, converts reel URLs to post format */
 const createEmbedFromUrl = (url: string): EmbedData | null => {
   // Try Instagram first
   const instagramData = parseInstagramUrl(url);
@@ -236,7 +256,11 @@ const createEmbedFromUrl = (url: string): EmbedData | null => {
   return null;
 };
 
-// Storage functions
+// ============================================================================
+// Storage Functions
+// ============================================================================
+
+/** Saves dynamic embeds to AsyncStorage */
 const saveDynamicEmbeds = async (embeds: EmbedData[]): Promise<void> => {
   try {
     await AsyncStorage.setItem(STORAGE_KEYS.DYNAMIC_EMBEDS, JSON.stringify(embeds));
@@ -246,7 +270,7 @@ const saveDynamicEmbeds = async (embeds: EmbedData[]): Promise<void> => {
 };
 
 
-
+/** Loads dynamic embeds from AsyncStorage */
 const loadDynamicEmbeds = async (): Promise<EmbedData[]> => {
   try {
     const stored = await AsyncStorage.getItem(STORAGE_KEYS.DYNAMIC_EMBEDS);
@@ -257,6 +281,11 @@ const loadDynamicEmbeds = async (): Promise<EmbedData[]> => {
   }
 };
 
+// ============================================================================
+// Main Component
+// ============================================================================
+
+/** Main EmbedsScreen component - handles grid display, share intents, and embed playback */
 export default function EmbedsScreen() {
   const [active, setActive] = React.useState<Provider>('menu');
   const [selectedEmbed, setSelectedEmbed] = React.useState<EmbedData | null>(null);
@@ -301,7 +330,7 @@ export default function EmbedsScreen() {
     }
   }, [dynamicEmbeds, isLoading, tiktokThumbnails]);
 
-  // Delete function
+  /** Removes embed from state and AsyncStorage */
   const deleteEmbed = async (embedId: string): Promise<void> => {
     try {
       const newEmbeds = dynamicEmbeds.filter(e => e.id !== embedId);
@@ -349,6 +378,7 @@ export default function EmbedsScreen() {
   // Combine starter embeds with dynamic embeds, sorted by creation time
   const allEmbeds = [...STARTER_EMBEDS, ...dynamicEmbeds].sort((a, b) => b.createdAt - a.createdAt);
 
+  /** Renders individual clip card with thumbnail, play overlay, and delete button */
   const renderClipCard = ({ item: embed }: { item: EmbedData }) => {
     const isNewlyShared = dynamicEmbeds.some(e => e.id === embed.id);
     const isJustCreated = hasShareIntent && shareIntent.webUrl && 
@@ -469,6 +499,7 @@ export default function EmbedsScreen() {
     );
   };
 
+  /** Renders main grid view with all clips */
   const renderMenu = () => (
     <View style={styles.menuContainer}>
       <Text style={styles.title}>All Saved Clips</Text>
@@ -511,6 +542,7 @@ export default function EmbedsScreen() {
     </View>
   );
 
+  /** Floating back button for embed view */
   const BackFloating = () => (
     <TouchableOpacity style={styles.backButton} onPress={() => {
       setActive('menu');
@@ -520,6 +552,7 @@ export default function EmbedsScreen() {
     </TouchableOpacity>
   );
 
+  /** Renders WebView for playing selected embed with error handling */
   const renderWebView = () => {
     if (!selectedEmbed) {
       console.log('No selected embed, returning to menu');
