@@ -513,11 +513,9 @@ export default function EmbedsScreen() {
 
   /** Renders individual clip card with thumbnail, play overlay, and delete button */
   const renderClipCard = ({ item: embed }: { item: EmbedData }) => {
-    // Only show new tag for the most recently created dynamic embed
+    // Show new tag for the most recently created dynamic embed
     const isMostRecent = dynamicEmbeds.length > 0 && 
       dynamicEmbeds[dynamicEmbeds.length - 1].id === embed.id;
-    const isJustCreated = hasShareIntent && shareIntent.webUrl && 
-      shareIntent.webUrl === embed.url;
     
     // Get thumbnail URL based on platform
     let thumbnailUrl = getThumbnailUrl(embed);
@@ -599,12 +597,7 @@ export default function EmbedsScreen() {
             {/* Badges */}
             {isMostRecent && (
               <View style={styles.badgeContainer}>
-                <Text style={styles.newBadge}>🆕</Text>
-              </View>
-            )}
-            {isJustCreated && (
-              <View style={styles.badgeContainer}>
-                <Text style={styles.justAddedBadge}>✨</Text>
+                <Text style={styles.newBadge}>New</Text>
               </View>
             )}
           </View>
@@ -628,7 +621,7 @@ export default function EmbedsScreen() {
           style={styles.deleteButton}
           onPress={() => deleteEmbed(embed.id)}
         >
-          <Text style={styles.deleteButtonText}>🗑️</Text>
+          <Text style={styles.deleteButtonText}>×</Text>
         </TouchableOpacity>
       </View>
     );
@@ -646,7 +639,7 @@ export default function EmbedsScreen() {
             setShowFilterPage(true);
           }}
         >
-          <Text style={styles.filterButtonText}>🔍</Text>
+          <Text style={styles.filterButtonText}>⚙</Text>
         </TouchableOpacity>
       </View>
       
@@ -716,16 +709,16 @@ export default function EmbedsScreen() {
       setActive('menu');
       setSelectedEmbed(null);
     }}>
-      <Text style={styles.backButtonText}>←</Text>
+      <Text style={styles.backButtonText}>‹</Text>
     </TouchableOpacity>
   );
 
   /** Renders filter page */
   const renderFilterPage = () => {
     const sites = [
-      { key: 'youtube', label: 'YouTube', icon: '📺' },
-      { key: 'tiktok', label: 'TikTok', icon: '🎵' },
-      { key: 'instagram', label: 'Instagram', icon: '📷' }
+      { key: 'youtube', label: 'YouTube', icon: '▶' },
+      { key: 'tiktok', label: 'TikTok', icon: '♪' },
+      { key: 'instagram', label: 'Instagram', icon: '◉' }
     ];
 
     const toggleSite = (siteKey: string) => {
@@ -744,7 +737,7 @@ export default function EmbedsScreen() {
     return (
       <View style={styles.container}>
         <StatusBar style="light" />
-        <View style={{ flex: 1, paddingHorizontal: 20, paddingTop: 80 }}>
+        <View style={{ flex: 1, paddingHorizontal: 20, paddingTop: 100 }}>
           <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 32 }}>
             <TouchableOpacity 
               style={styles.backButton}
@@ -753,7 +746,7 @@ export default function EmbedsScreen() {
                 setShowFilterPage(false);
               }}
             >
-              <Text style={styles.backButtonText}>←</Text>
+              <Text style={styles.backButtonText}>‹</Text>
             </TouchableOpacity>
             <Text style={{ color: '#e8e8ea', fontSize: 24, fontWeight: '700', flex: 1, textAlign: 'center' }}>Filter Clips</Text>
             <View style={{ width: 40 }} />
@@ -786,7 +779,7 @@ export default function EmbedsScreen() {
                   {site.label}
                 </Text>
                 {selectedSites.has(site.key) && (
-                  <Text style={{ color: '#007bff', fontSize: 18, fontWeight: '600' }}>✓</Text>
+                  <Text style={{ color: '#007bff', fontSize: 18, fontWeight: '600' }}>●</Text>
                 )}
               </TouchableOpacity>
             ))}
