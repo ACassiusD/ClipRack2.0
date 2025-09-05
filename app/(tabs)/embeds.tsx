@@ -620,6 +620,13 @@ export default function EmbedsScreen() {
                   <View style={[styles.tiktokColorSection, styles.tiktokColorSection3]} />
                 </View>
               ) : null}
+              {embed.type === 'instagram' ? (
+                <View style={styles.platformTagInstagramGradient}>
+                  <View style={[styles.instagramColorSection, styles.instagramColorSection1]} />
+                  <View style={[styles.instagramColorSection, styles.instagramColorSection2]} />
+                  <View style={[styles.instagramColorSection, styles.instagramColorSection3]} />
+                </View>
+              ) : null}
               <Text style={[styles.platformTagText, { zIndex: 1, position: 'relative' }]}>{platformInfo.name}</Text>
             </View>
             

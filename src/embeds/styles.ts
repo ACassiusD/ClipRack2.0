@@ -195,12 +195,12 @@ export const styles = StyleSheet.create({
     borderColor: 'rgba(255, 255, 255, 0.15)',
   },
   platformTagYouTube: {
-    backgroundColor: 'rgba(204, 0, 0, 0.3)',
-    borderColor: 'rgba(255, 0, 0, 0.2)',
+    backgroundColor: 'rgba(204, 0, 0, 0.4)',
+    borderColor: 'rgba(255, 0, 0, 0.4)',
   },
   platformTagTikTok: {
     backgroundColor: 'transparent',
-    borderColor: 'rgba(0, 242, 234, 0.3)',
+    borderColor: 'rgba(0, 242, 234, 0.4)',
     overflow: 'hidden',
   },
   platformTagTikTokGradient: {
@@ -218,17 +218,41 @@ export const styles = StyleSheet.create({
     height: '100%',
   },
   tiktokColorSection1: {
-    backgroundColor: 'rgba(0, 242, 234, 0.3)',
+    backgroundColor: 'rgba(0, 242, 234, 0.4)',
   },
   tiktokColorSection2: {
-    backgroundColor: 'rgba(0, 0, 0, 0.3)',
+    backgroundColor: 'rgba(0, 0, 0, 0.4)',
   },
   tiktokColorSection3: {
-    backgroundColor: 'rgba(255, 0, 80, 0.3)',
+    backgroundColor: 'rgba(255, 0, 80, 0.4)',
   },
   platformTagInstagram: {
-    backgroundColor: 'rgba(228, 64, 95, 0.3)',
-    borderColor: 'rgba(255, 100, 130, 0.2)',
+    backgroundColor: 'transparent',
+    borderColor: 'rgba(131, 58, 180, 1)',
+    overflow: 'hidden',
+  },
+  platformTagInstagramGradient: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    borderRadius: 6,
+    overflow: 'hidden',
+    flexDirection: 'column',
+  },
+  instagramColorSection: {
+    flex: 1,
+    height: '100%',
+  },
+  instagramColorSection1: {
+    backgroundColor: 'rgba(131, 58, 180, 0.4)',
+  },
+  instagramColorSection2: {
+    backgroundColor: 'rgba(225, 48, 108, 0.4)',
+  },
+  instagramColorSection3: {
+    backgroundColor: 'rgba(252, 175, 69, 0.4)',
   },
   platformTagText: {
     color: '#fff',
