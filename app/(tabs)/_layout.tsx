@@ -43,7 +43,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="embeds"
         options={{
-          title: 'Clips',
+          title: 'Clips Gallery',
           tabBarIcon: ({ color }) => <IconSymbol size={28} name="play.rectangle.fill" color={color} />,
         }}
       />
