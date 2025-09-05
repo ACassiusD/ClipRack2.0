@@ -174,6 +174,7 @@ const fetchTikTokThumbnail = async (videoId: string, isShortUrl: boolean = false
   }
 };
 
+
 /** Returns thumbnail URL for YouTube, null for others (handled separately) */
 const getThumbnailUrl = (embed: EmbedData): string | null => {
   if (!embed.type) {
@@ -377,6 +378,7 @@ export default function EmbedsScreen() {
   const [dynamicEmbeds, setDynamicEmbeds] = React.useState<EmbedData[]>([]);
   const [isLoading, setIsLoading] = React.useState(true);
   const [tiktokThumbnails, setTiktokThumbnails] = React.useState<Record<string, string>>({});
+  const [loadingThumbnails, setLoadingThumbnails] = React.useState<Set<string>>(new Set());
   const [showShareBanner, setShowShareBanner] = React.useState(false);
   const [showFilterPage, setShowFilterPage] = React.useState(false);
   const [selectedSites, setSelectedSites] = React.useState<Set<string>>(new Set(['youtube', 'tiktok', 'instagram']));
@@ -394,15 +396,19 @@ export default function EmbedsScreen() {
     loadSavedEmbeds();
   }, []);
 
-  // Fetch TikTok thumbnails for all TikTok embeds
-  React.useEffect(() => {
-    const fetchTikTokThumbnails = async () => {
-      const allEmbeds = [...STARTER_EMBEDS, ...dynamicEmbeds];
-      const tiktokEmbeds = allEmbeds.filter(embed => embed.type === 'tiktok' && embed.postId);
-      
-      for (const embed of tiktokEmbeds) {
-        if (embed.postId && !tiktokThumbnails[embed.postId]) {
-          console.log('🔄 Fetching TikTok thumbnail for:', embed.postId);
+  // Fetch thumbnails for specific embeds only (TikTok only)
+  const fetchThumbnailsForEmbeds = React.useCallback(async (embeds: EmbedData[]) => {
+    const tiktokEmbeds = embeds.filter(embed => embed.type === 'tiktok' && embed.postId);
+    
+    // Fetch TikTok thumbnails
+    for (const embed of tiktokEmbeds) {
+      if (embed.postId && !tiktokThumbnails[embed.postId] && !loadingThumbnails.has(embed.postId)) {
+        console.log('🔄 Fetching TikTok thumbnail for:', embed.postId);
+        
+        // Mark as loading
+        setLoadingThumbnails(prev => new Set([...prev, embed.postId!]));
+        
+        try {
           const thumbnailUrl = await fetchTikTokThumbnail(embed.postId, embed.isShortUrl);
           if (thumbnailUrl) {
             setTiktokThumbnails(prev => ({
@@ -410,14 +416,27 @@ export default function EmbedsScreen() {
               [embed.postId!]: thumbnailUrl
             }));
           }
+        } catch (error) {
+          console.error('Failed to fetch TikTok thumbnail for:', embed.postId, error);
+        } finally {
+          // Remove from loading state
+          setLoadingThumbnails(prev => {
+            const newSet = new Set(prev);
+            newSet.delete(embed.postId!);
+            return newSet;
+          });
         }
       }
-    };
-
-    if (!isLoading) {
-      fetchTikTokThumbnails();
     }
-  }, [dynamicEmbeds, isLoading, tiktokThumbnails]);
+  }, [tiktokThumbnails, loadingThumbnails]);
+
+
+  // Initial load: fetch thumbnails for all embeds on first load
+  React.useEffect(() => {
+    if (!isLoading && dynamicEmbeds.length > 0) {
+      fetchThumbnailsForEmbeds([...STARTER_EMBEDS, ...dynamicEmbeds]);
+    }
+  }, [isLoading, fetchThumbnailsForEmbeds]);
 
   /** Removes embed from state and AsyncStorage */
   const deleteEmbed = async (embedId: string): Promise<void> => {
@@ -439,8 +458,12 @@ export default function EmbedsScreen() {
       const saved = await loadDynamicEmbeds();
       setDynamicEmbeds(saved);
       
-      // Clear TikTok thumbnails to force re-fetch
+      // Clear thumbnails to force re-fetch
       setTiktokThumbnails({});
+      setLoadingThumbnails(new Set());
+      
+      // Re-fetch all thumbnails
+      fetchThumbnailsForEmbeds([...STARTER_EMBEDS, ...saved]);
       
       console.log('🔄 Refreshed clips list');
     } catch (error) {
@@ -448,7 +471,7 @@ export default function EmbedsScreen() {
     } finally {
       setRefreshing(false);
     }
-  }, []);
+  }, [fetchThumbnailsForEmbeds]);
 
   // Process shared content and create embeds
   React.useEffect(() => {
@@ -471,6 +494,9 @@ export default function EmbedsScreen() {
             // Save to AsyncStorage
             saveDynamicEmbeds(newEmbeds);
             console.log('💾 Saved embed to storage');
+            
+            // Fetch thumbnail only for the new clip (incremental loading)
+            fetchThumbnailsForEmbeds([embed]);
             
             // Show the banner for 8 seconds
             setShowShareBanner(true);
@@ -512,16 +538,11 @@ export default function EmbedsScreen() {
     });
 
   /** Renders individual clip card with thumbnail, play overlay, and delete button */
-  const renderClipCard = ({ item: embed }: { item: EmbedData }) => {
-    // Show new tag for the most recently created dynamic embed
-    const isMostRecent = dynamicEmbeds.length > 0 && 
-      dynamicEmbeds[dynamicEmbeds.length - 1].id === embed.id;
-    
-    // Get thumbnail URL based on platform
-    let thumbnailUrl = getThumbnailUrl(embed);
-    if (embed.type === 'tiktok' && embed.postId) {
-      thumbnailUrl = tiktokThumbnails[embed.postId] || null;
-    }
+  const ClipCard = React.memo(({ item: embed, isMostRecent, thumbnailUrl }: { 
+    item: EmbedData; 
+    isMostRecent: boolean; 
+    thumbnailUrl: string | null; 
+  }) => {
 
     // Get platform display name and color
     const getPlatformInfo = (type: string) => {
@@ -547,8 +568,9 @@ export default function EmbedsScreen() {
           {/* Thumbnail Container */}
           <View style={styles.thumbnailContainer}>
             {embed.type === 'instagram' ? (
-              // Instagram: Use actual embed preview like your Next.js example
+              // Instagram: Use WebView embed
               <WebView
+                key={`instagram-${embed.id}-${embed.url}`}
                 source={{ 
                   uri: `${embed.url.replace(/\/$/, '')}/embed`,
                   headers: {
@@ -591,11 +613,17 @@ export default function EmbedsScreen() {
                 }}
               />
             ) : (
-              // Fallback: Show placeholder
+              // Fallback: Show placeholder or loading state
               <View style={[styles.thumbnail, styles.placeholderThumbnail]}>
-                <Text style={styles.placeholderText}>
-                  {embed.type?.toUpperCase() || 'CLIP'}
-                </Text>
+                {embed.type === 'tiktok' && embed.postId && loadingThumbnails.has(embed.postId) ? (
+                  <View style={styles.loadingContainer}>
+                    <Text style={styles.loadingText}>Loading...</Text>
+                  </View>
+                ) : (
+                  <Text style={styles.placeholderText}>
+                    {embed.type?.toUpperCase() || 'CLIP'}
+                  </Text>
+                )}
               </View>
             )}
             
@@ -648,6 +676,30 @@ export default function EmbedsScreen() {
         </TouchableOpacity>
       </View>
     );
+  }, (prevProps, nextProps) => {
+    // Only re-render if the embed data actually changed
+    return prevProps.item.id === nextProps.item.id && 
+           prevProps.item.url === nextProps.item.url &&
+           prevProps.item.type === nextProps.item.type &&
+           prevProps.item.createdAt === nextProps.item.createdAt &&
+           prevProps.item.postId === nextProps.item.postId &&
+           prevProps.item.videoId === nextProps.item.videoId &&
+           prevProps.isMostRecent === nextProps.isMostRecent &&
+           prevProps.thumbnailUrl === nextProps.thumbnailUrl;
+  });
+
+  /** Render function for FlatList */
+  const renderClipCard = ({ item }: { item: EmbedData }) => {
+    // Calculate values outside the memoized component
+    const isMostRecent = dynamicEmbeds.length > 0 && 
+      dynamicEmbeds[dynamicEmbeds.length - 1].id === item.id;
+    
+    let thumbnailUrl = getThumbnailUrl(item);
+    if (item.type === 'tiktok' && item.postId) {
+      thumbnailUrl = tiktokThumbnails[item.postId] || null;
+    }
+    
+    return <ClipCard item={item} isMostRecent={isMostRecent} thumbnailUrl={thumbnailUrl} />;
   };
 
   /** Renders main grid view with all clips */
@@ -703,11 +755,15 @@ export default function EmbedsScreen() {
         <FlatList
           data={allEmbeds}
           renderItem={renderClipCard}
-          keyExtractor={(item) => item.id}
+          keyExtractor={(item) => `${item.id}-${item.url}`}
           numColumns={2}
           columnWrapperStyle={styles.row}
           contentContainerStyle={styles.gridContent}
           showsVerticalScrollIndicator={false}
+          removeClippedSubviews={true}
+          maxToRenderPerBatch={10}
+          windowSize={10}
+          initialNumToRender={6}
           refreshControl={
             <RefreshControl
               refreshing={refreshing}

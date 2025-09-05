@@ -142,6 +142,11 @@ export const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '600',
   },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   playOverlay: {
     position: 'absolute',
     top: 0,
