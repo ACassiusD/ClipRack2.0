@@ -85,6 +85,8 @@ const generateInstagramTileHtml = (postId: string): string => {
     max-width:100% !important;
     min-width:0 !important;
     width:100% !important;
+    transform: scale(2); /* 2x zoom */
+    transform-origin: center center; /* Scale from center */
   }
   /* Instagram injects inner wrappers; make sure they don't force width */
   .instagram-media, .instagram-media * {
