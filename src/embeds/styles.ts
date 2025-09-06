@@ -862,8 +862,7 @@ export const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 12,
     borderRadius: 20,
-    marginTop: 16,
-    marginBottom: 8,
+    marginBottom: 15,
     borderWidth: 1,
     borderColor: 'rgba(0, 123, 255, 0.3)',
     shadowColor: '#007bff',
@@ -881,7 +880,7 @@ export const styles = StyleSheet.create({
   },
   clearFilterButton: {
     marginLeft: 12,
-    padding: 6,
+    padding: 8,
     borderRadius: 12,
     backgroundColor: 'rgba(0, 123, 255, 0.2)',
   },

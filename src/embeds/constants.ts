@@ -47,21 +47,9 @@ export const DEFAULT_CATEGORIES: Category[] = [
     createdAt: Date.now()
   },
   {
-    id: 'funny',
-    name: 'Funny',
-    color: '#4ECDC4',
-    createdAt: Date.now()
-  },
-  {
     id: 'educational',
     name: 'Educational',
     color: '#45B7D1',
-    createdAt: Date.now()
-  },
-  {
-    id: 'music',
-    name: 'Music',
-    color: '#96CEB4',
     createdAt: Date.now()
   },
   {
@@ -74,6 +62,18 @@ export const DEFAULT_CATEGORIES: Category[] = [
     id: 'cooking',
     name: 'Cooking',
     color: '#DDA0DD',
+    createdAt: Date.now()
+  },
+  {
+    id: 'fashion',
+    name: 'Fashion',
+    color: '#FF9FF3',
+    createdAt: Date.now()
+  },
+  {
+    id: 'gaming',
+    name: 'Gaming',
+    color: '#54A0FF',
     createdAt: Date.now()
   }
 ];
