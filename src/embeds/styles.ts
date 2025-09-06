@@ -21,7 +21,7 @@ export const styles = StyleSheet.create({
   },
   titleRow: {
     flexDirection: 'row',
-    justifyContent: 'center',
+    justifyContent: 'flex-start',
     alignItems: 'center',
     marginBottom: 16,
     paddingTop: 60,
@@ -33,6 +33,10 @@ export const styles = StyleSheet.create({
     fontSize: 28,
     fontWeight: '700',
     textAlign: 'center',
+    flex: 1,
+  },
+  titleSpacer: {
+    width: 44, // Same width as filter button to balance the layout
   },
   filterButton: {
     backgroundColor: 'rgba(0, 123, 255, 0.15)',
@@ -518,13 +522,13 @@ export const styles = StyleSheet.create({
   },
   modalHeader: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: 20,
     paddingTop: 60,
     paddingBottom: 20,
     borderBottomWidth: 1,
     borderBottomColor: 'rgba(255, 255, 255, 0.1)',
+    position: 'relative',
   },
   modalCloseButton: {
     padding: 8,
@@ -538,6 +542,9 @@ export const styles = StyleSheet.create({
     color: '#e8e8ea',
     fontSize: 18,
     fontWeight: '600',
+    flex: 1,
+    textAlign: 'center',
+    marginHorizontal: 20,
   },
   modalSaveButton: {
     backgroundColor: '#007bff',
@@ -573,25 +580,28 @@ export const styles = StyleSheet.create({
   },
   modalContent: {
     flex: 1,
-    paddingHorizontal: 20,
   },
   
   // Clip info styles
   clipInfo: {
-    paddingVertical: 20,
+    paddingVertical: 24,
+    paddingHorizontal: 20,
     borderBottomWidth: 1,
     borderBottomColor: 'rgba(255, 255, 255, 0.1)',
+    backgroundColor: 'rgba(255, 255, 255, 0.02)',
   },
   clipTitle: {
     color: '#e8e8ea',
-    fontSize: 20,
-    fontWeight: '600',
-    marginBottom: 8,
+    fontSize: 22,
+    fontWeight: '700',
+    marginBottom: 12,
+    lineHeight: 28,
   },
   clipSubtitle: {
     color: '#999',
     fontSize: 16,
-    marginBottom: 8,
+    marginBottom: 12,
+    lineHeight: 22,
   },
   clipUrl: {
     color: '#666',
@@ -601,18 +611,84 @@ export const styles = StyleSheet.create({
   
   // Categories section
   categoriesSection: {
-    paddingVertical: 20,
+    paddingVertical: 24,
+    paddingHorizontal: 20,
   },
   categoriesHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 16,
+    marginBottom: 20,
   },
   categoriesTitle: {
     color: '#e8e8ea',
-    fontSize: 18,
+    fontSize: 20,
+    fontWeight: '700',
+  },
+  addToCategoriesButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 123, 255, 0.15)',
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: 'rgba(0, 123, 255, 0.4)',
+    gap: 6,
+  },
+  addToCategoriesButtonText: {
+    color: '#007bff',
+    fontSize: 14,
     fontWeight: '600',
+  },
+  selectedCategoriesList: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+    marginBottom: 16,
+  },
+  categoryBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 16,
+    gap: 6,
+  },
+  categoryBadgeText: {
+    color: '#fff',
+    fontSize: 12,
+    fontWeight: '600',
+  },
+  categoryBadgeRemove: {
+    padding: 2,
+  },
+  categoryDropdown: {
+    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.1)',
+    padding: 8,
+    marginTop: 8,
+  },
+  categoryDropdownItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: 12,
+    paddingHorizontal: 8,
+    borderRadius: 8,
+  },
+  categoryDropdownItemLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+  },
+  categoryDropdownItemText: {
+    color: '#e8e8ea',
+    fontSize: 16,
+    fontWeight: '500',
+    marginLeft: 8,
   },
   manageCategoriesButton: {
     backgroundColor: 'rgba(0, 123, 255, 0.15)',

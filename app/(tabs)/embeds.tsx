@@ -16,6 +16,7 @@ import React from 'react';
 import { Alert, FlatList, Image, Modal, RefreshControl, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { WebView } from 'react-native-webview';
 
+import { IconSymbol } from '../../components/ui/IconSymbol';
 import { CATEGORY_COLORS, DEFAULT_CATEGORIES, STARTER_EMBEDS, STORAGE_KEYS } from '../../src/embeds/constants';
 import { styles } from '../../src/embeds/styles';
 import { Category, EmbedData, Provider } from '../../src/embeds/types';
@@ -448,6 +449,7 @@ export default function EmbedsScreen() {
   const [categories, setCategories] = React.useState<Category[]>([]);
   const [showClipDetails, setShowClipDetails] = React.useState(false);
   const [selectedClipForDetails, setSelectedClipForDetails] = React.useState<EmbedData | null>(null);
+  const [showCategoryDropdown, setShowCategoryDropdown] = React.useState(false);
   const [showCategoryManager, setShowCategoryManager] = React.useState(false);
   const [selectedCategories, setSelectedCategories] = React.useState<Set<string>>(new Set());
   const [newCategoryName, setNewCategoryName] = React.useState('');
@@ -856,7 +858,7 @@ export default function EmbedsScreen() {
             setShowClipDetails(true);
           }}
         >
-          <Text style={styles.editButtonText}>✏️</Text>
+          <IconSymbol name="pencil" size={16} color="#007bff" />
         </TouchableOpacity>
       </View>
     );
@@ -895,6 +897,7 @@ export default function EmbedsScreen() {
   const renderMenu = () => (
     <View style={styles.menuContainer}>
       <View style={styles.titleRow}>
+        <View style={styles.titleSpacer} />
         <Text style={styles.title}>Saved Clips</Text>
         <TouchableOpacity 
           style={[styles.filterButton, (filterByCategory || selectedSites.size < 3) && styles.filterButtonActive]}
@@ -903,7 +906,7 @@ export default function EmbedsScreen() {
             setShowFilterPage(true);
           }}
         >
-          <Text style={styles.filterButtonText}>Filter</Text>
+          <IconSymbol name="line.3.horizontal.decrease" size={20} color="#007bff" />
         </TouchableOpacity>
       </View>
       
@@ -921,7 +924,7 @@ export default function EmbedsScreen() {
             style={styles.clearFilterButton}
             onPress={() => setFilterByCategory(null)}
           >
-            <Text style={styles.clearFilterButtonText}>✕</Text>
+            <IconSymbol name="xmark" size={14} color="#007bff" />
           </TouchableOpacity>
         </View>
       )}
@@ -1053,7 +1056,7 @@ export default function EmbedsScreen() {
               style={styles.modalCloseButton}
               onPress={() => setShowClipDetails(false)}
             >
-              <Text style={styles.modalCloseButtonText}>✕</Text>
+              <IconSymbol name="xmark" size={18} color="#e8e8ea" />
             </TouchableOpacity>
             <Text style={styles.modalTitle}>Clip Details</Text>
             <View style={styles.modalHeaderActions}>
@@ -1061,7 +1064,7 @@ export default function EmbedsScreen() {
                 style={styles.modalDeleteButton}
                 onPress={handleDeleteClip}
               >
-                <Text style={styles.modalDeleteButtonText}>🗑️</Text>
+                <IconSymbol name="trash" size={18} color="#FF3B30" />
               </TouchableOpacity>
               <TouchableOpacity 
                 style={styles.modalSaveButton}
@@ -1083,37 +1086,60 @@ export default function EmbedsScreen() {
               <View style={styles.categoriesHeader}>
                 <Text style={styles.categoriesTitle}>Categories</Text>
                 <TouchableOpacity 
-                  style={styles.manageCategoriesButton}
-                  onPress={() => setShowCategoryManager(true)}
+                  style={styles.addToCategoriesButton}
+                  onPress={() => setShowCategoryDropdown(!showCategoryDropdown)}
                 >
-                  <Text style={styles.manageCategoriesButtonText}>Manage</Text>
+                  <IconSymbol name="plus" size={16} color="#007bff" />
+                  <Text style={styles.addToCategoriesButtonText}>Add to Categories</Text>
                 </TouchableOpacity>
               </View>
 
-              <View style={styles.categoriesList}>
-                {categories.map(category => {
-                  const isSelected = selectedCategories.has(category.id);
-                  return (
-                    <TouchableOpacity
-                      key={category.id}
-                      style={[
-                        styles.categoryChip,
-                        isSelected && styles.categoryChipSelected,
-                        { borderColor: category.color }
-                      ]}
-                      onPress={() => handleCategoryToggle(category.id)}
-                    >
-                      <View style={[styles.categoryColorDot, { backgroundColor: category.color }]} />
-                      <Text style={[
-                        styles.categoryChipText,
-                        isSelected && styles.categoryChipTextSelected
-                      ]}>
-                        {category.name}
-                      </Text>
-                    </TouchableOpacity>
-                  );
-                })}
-              </View>
+              {/* Selected Categories Badges */}
+              {selectedCategories.size > 0 && (
+                <View style={styles.selectedCategoriesList}>
+                  {Array.from(selectedCategories).map(categoryId => {
+                    const category = categories.find(c => c.id === categoryId);
+                    if (!category) return null;
+                    return (
+                      <View key={categoryId} style={[styles.categoryBadge, { backgroundColor: category.color }]}>
+                        <Text style={styles.categoryBadgeText}>{category.name}</Text>
+                        <TouchableOpacity 
+                          onPress={() => handleCategoryToggle(categoryId)}
+                          style={styles.categoryBadgeRemove}
+                        >
+                          <IconSymbol name="xmark" size={12} color="#fff" />
+                        </TouchableOpacity>
+                      </View>
+                    );
+                  })}
+                </View>
+              )}
+
+              {/* Category Dropdown */}
+              {showCategoryDropdown && (
+                <View style={styles.categoryDropdown}>
+                  {categories.map(category => {
+                    const isSelected = selectedCategories.has(category.id);
+                    return (
+                      <TouchableOpacity
+                        key={category.id}
+                        style={styles.categoryDropdownItem}
+                        onPress={() => handleCategoryToggle(category.id)}
+                      >
+                        <View style={styles.categoryDropdownItemLeft}>
+                          <View style={[styles.categoryColorDot, { backgroundColor: category.color }]} />
+                          <Text style={styles.categoryDropdownItemText}>{category.name}</Text>
+                        </View>
+                        <IconSymbol 
+                          name={isSelected ? "checkmark" : "circle"} 
+                          size={20} 
+                          color={isSelected ? "#007bff" : "#666"} 
+                        />
+                      </TouchableOpacity>
+                    );
+                  })}
+                </View>
+              )}
             </View>
           </ScrollView>
         </View>
@@ -1154,7 +1180,7 @@ export default function EmbedsScreen() {
               style={styles.modalCloseButton}
               onPress={() => setShowCategoryManager(false)}
             >
-              <Text style={styles.modalCloseButtonText}>✕</Text>
+              <IconSymbol name="xmark" size={18} color="#e8e8ea" />
             </TouchableOpacity>
             <Text style={styles.modalTitle}>Manage Categories</Text>
             <View style={styles.modalHeaderSpacer} />
@@ -1192,7 +1218,7 @@ export default function EmbedsScreen() {
                     style={styles.deleteCategoryButton}
                     onPress={() => handleDeleteCategory(category.id)}
                   >
-                    <Text style={styles.deleteCategoryButtonText}>🗑️</Text>
+                    <IconSymbol name="trash" size={16} color="#FF3B30" />
                   </TouchableOpacity>
                 </View>
               ))}
