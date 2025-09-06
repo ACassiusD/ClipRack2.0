@@ -65,6 +65,45 @@ const generateInstagramHtml = (postId: string): string => {
   </body></html>`;
 };
 
+/** Generates Instagram tile HTML for grid cards - sized to fit within card constraints */
+const generateInstagramTileHtml = (postId: string): string => {
+  return `<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<style>
+  html, body { margin:0; padding:0; height:100%; background:#000; }
+  /* Center the embed within the tile */
+  .wrap {
+    display:flex; align-items:center; justify-content:center;
+    width:100%; height:100%; /* Use full available height */
+    position:relative; /* Better positioning control */
+  }
+  /* Kill Instagram's min/max constraints and let it shrink */
+  .instagram-media {
+    margin:0 auto !important;
+    max-width:100% !important;
+    min-width:0 !important;
+    width:100% !important;
+  }
+  /* Instagram injects inner wrappers; make sure they don't force width */
+  .instagram-media, .instagram-media * {
+    box-sizing:border-box;
+    max-width:100% !important;
+  }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <blockquote class="instagram-media"
+      data-instgrm-permalink="https://www.instagram.com/p/${postId}/"
+      data-instgrm-version="14"></blockquote>
+  </div>
+  <script async src="https://www.instagram.com/embed.js"></script>
+</body>
+</html>`;
+};
+
 /** Main HTML generator - routes to appropriate platform-specific generator */
 const generateEmbedHtml = (embed: EmbedData): string => {
   if (!embed.type) {
@@ -687,22 +726,22 @@ export default function EmbedsScreen() {
           {/* Thumbnail Container */}
           <View style={styles.thumbnailContainer}>
             {embed.type === 'instagram' ? (
-              // Instagram: Use WebView embed
+              // Instagram: Use custom HTML wrapper for proper grid sizing
               <WebView
                 ref={webViewRef}
                 key={`instagram-${embed.id}-${embed.postId}`}
                 source={{ 
-                  uri: `${embed.url.replace(/\/$/, '')}/embed`,
-                  headers: {
-                    'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 14_0 like Mac OS X) AppleWebKit/605.1.15'
-                  }
+                  html: generateInstagramTileHtml(embed.postId!),
+                  baseUrl: 'https://www.instagram.com'
                 }}
+                originWhitelist={['*']}
                 style={styles.thumbnail}
                 scrollEnabled={false}
                 showsHorizontalScrollIndicator={false}
                 showsVerticalScrollIndicator={false}
                 javaScriptEnabled={true}
                 domStorageEnabled={true}
+                setSupportMultipleWindows={false}
                 allowsInlineMediaPlayback={false}
                 mediaPlaybackRequiresUserAction={true}
                 allowsFullscreenVideo={false}
@@ -766,11 +805,11 @@ export default function EmbedsScreen() {
             )}
             
             {/* Play Overlay */}
-            <View style={styles.playOverlay}>
+            {/* <View style={styles.playOverlay}>
               <View style={styles.playButton}>
                 <Text style={styles.playIcon}>▶</Text>
               </View>
-            </View>
+            </View> */}
             
             {/* Platform Tag */}
             <View style={[
