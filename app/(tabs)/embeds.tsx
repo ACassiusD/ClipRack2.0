@@ -13,12 +13,12 @@ import * as Haptics from 'expo-haptics';
 import { useShareIntentContext } from 'expo-share-intent';
 import { StatusBar } from 'expo-status-bar';
 import React from 'react';
-import { FlatList, Image, RefreshControl, Text, TouchableOpacity, View } from 'react-native';
+import { Alert, FlatList, Image, Modal, RefreshControl, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { WebView } from 'react-native-webview';
 
-import { STARTER_EMBEDS, STORAGE_KEYS } from '../../src/embeds/constants';
+import { CATEGORY_COLORS, DEFAULT_CATEGORIES, STARTER_EMBEDS, STORAGE_KEYS } from '../../src/embeds/constants';
 import { styles } from '../../src/embeds/styles';
-import { EmbedData, Provider } from '../../src/embeds/types';
+import { Category, EmbedData, Provider } from '../../src/embeds/types';
 
 // ============================================================================
 // HTML Generation Utilities
@@ -367,6 +367,26 @@ const loadDynamicEmbeds = async (): Promise<EmbedData[]> => {
   }
 };
 
+/** Saves categories to AsyncStorage */
+const saveCategories = async (categories: Category[]): Promise<void> => {
+  try {
+    await AsyncStorage.setItem(STORAGE_KEYS.CATEGORIES, JSON.stringify(categories));
+  } catch (error) {
+    console.error('Failed to save categories:', error);
+  }
+};
+
+/** Loads categories from AsyncStorage */
+const loadCategories = async (): Promise<Category[]> => {
+  try {
+    const stored = await AsyncStorage.getItem(STORAGE_KEYS.CATEGORIES);
+    return stored ? JSON.parse(stored) : DEFAULT_CATEGORIES;
+  } catch (error) {
+    console.error('Failed to load categories:', error);
+    return DEFAULT_CATEGORIES;
+  }
+};
+
 // ============================================================================
 // Main Component
 // ============================================================================
@@ -384,20 +404,31 @@ export default function EmbedsScreen() {
   const [showFilterPage, setShowFilterPage] = React.useState(false);
   const [selectedSites, setSelectedSites] = React.useState<Set<string>>(new Set(['youtube', 'tiktok', 'instagram']));
   const [refreshing, setRefreshing] = React.useState(false);
+  const [categories, setCategories] = React.useState<Category[]>([]);
+  const [showClipDetails, setShowClipDetails] = React.useState(false);
+  const [selectedClipForDetails, setSelectedClipForDetails] = React.useState<EmbedData | null>(null);
+  const [showCategoryManager, setShowCategoryManager] = React.useState(false);
+  const [selectedCategories, setSelectedCategories] = React.useState<Set<string>>(new Set());
+  const [newCategoryName, setNewCategoryName] = React.useState('');
+  const [filterByCategory, setFilterByCategory] = React.useState<string | null>(null);
   
   // Ref to track if thumbnails have been loaded to prevent Strict Mode double execution
   const thumbnailsLoadedRef = React.useRef(false);
   
   const { hasShareIntent, shareIntent, resetShareIntent } = useShareIntentContext();
 
-  // Load saved dynamic embeds on component mount
+  // Load saved dynamic embeds and categories on component mount
   React.useEffect(() => {
-    const loadSavedEmbeds = async () => {
-      const saved = await loadDynamicEmbeds();
-      setDynamicEmbeds(saved);
+    const loadSavedData = async () => {
+      const [savedEmbeds, savedCategories] = await Promise.all([
+        loadDynamicEmbeds(),
+        loadCategories()
+      ]);
+      setDynamicEmbeds(savedEmbeds);
+      setCategories(savedCategories);
       setIsLoading(false);
     };
-    loadSavedEmbeds();
+    loadSavedData();
   }, []);
 
   // Fetch thumbnails for specific embeds only (TikTok only)
@@ -466,6 +497,60 @@ export default function EmbedsScreen() {
     } catch (error) {
       console.error('Failed to delete embed:', error);
     }
+  };
+
+  /** Updates embed categories */
+  const updateEmbedCategories = async (embedId: string, newCategories: string[]): Promise<void> => {
+    try {
+      const updatedEmbeds = dynamicEmbeds.map(embed => 
+        embed.id === embedId 
+          ? { ...embed, categories: newCategories }
+          : embed
+      );
+      setDynamicEmbeds(updatedEmbeds);
+      await saveDynamicEmbeds(updatedEmbeds);
+      console.log('🏷️ Updated embed categories:', embedId, newCategories);
+    } catch (error) {
+      console.error('Failed to update embed categories:', error);
+    }
+  };
+
+  /** Creates a new category */
+  const createCategory = async (name: string): Promise<void> => {
+    if (!name.trim()) return;
+    
+    const newCategory: Category = {
+      id: `category-${Date.now()}`,
+      name: name.trim(),
+      color: CATEGORY_COLORS[categories.length % CATEGORY_COLORS.length],
+      createdAt: Date.now()
+    };
+    
+    const updatedCategories = [...categories, newCategory];
+    setCategories(updatedCategories);
+    await saveCategories(updatedCategories);
+    setNewCategoryName('');
+    console.log('➕ Created new category:', newCategory);
+  };
+
+  /** Deletes a category */
+  const deleteCategory = async (categoryId: string): Promise<void> => {
+    // Remove category from all embeds
+    const updatedEmbeds = dynamicEmbeds.map(embed => ({
+      ...embed,
+      categories: embed.categories?.filter(id => id !== categoryId) || []
+    }));
+    
+    // Remove category from categories list
+    const updatedCategories = categories.filter(cat => cat.id !== categoryId);
+    
+    setCategories(updatedCategories);
+    setDynamicEmbeds(updatedEmbeds);
+    await Promise.all([
+      saveCategories(updatedCategories),
+      saveDynamicEmbeds(updatedEmbeds)
+    ]);
+    console.log('🗑️ Deleted category:', categoryId);
   };
 
   /** Refreshes the clips list */
@@ -543,7 +628,17 @@ export default function EmbedsScreen() {
 
   // Combine starter embeds with dynamic embeds, with dynamic embeds always on top, then apply filters
   const allEmbeds = [...dynamicEmbeds, ...STARTER_EMBEDS]
-    .filter(embed => selectedSites.has(embed.type || ''))
+    .filter(embed => {
+      // Filter by platform
+      if (!selectedSites.has(embed.type || '')) return false;
+      
+      // Filter by category if selected
+      if (filterByCategory) {
+        return embed.categories?.includes(filterByCategory) || false;
+      }
+      
+      return true;
+    })
     .sort((a, b) => {
       // If both are dynamic embeds, sort by creation time (newest first)
       const aIsDynamic = dynamicEmbeds.some(e => e.id === a.id);
@@ -710,12 +805,17 @@ export default function EmbedsScreen() {
           </View>
         </TouchableOpacity>
         
-        {/* Delete Button */}
+        {/* Edit Button */}
         <TouchableOpacity 
-          style={styles.deleteButton}
-          onPress={() => deleteEmbed(embed.id)}
+          style={styles.editButton}
+          onPress={() => {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+            setSelectedClipForDetails(embed);
+            setSelectedCategories(new Set(embed.categories || []));
+            setShowClipDetails(true);
+          }}
         >
-          <Text style={styles.deleteButtonText}>×</Text>
+          <Text style={styles.editButtonText}>✏️</Text>
         </TouchableOpacity>
       </View>
     );
@@ -756,15 +856,34 @@ export default function EmbedsScreen() {
       <View style={styles.titleRow}>
         <Text style={styles.title}>Saved Clips</Text>
         <TouchableOpacity 
-          style={styles.filterButton}
+          style={[styles.filterButton, (filterByCategory || selectedSites.size < 3) && styles.filterButtonActive]}
           onPress={() => {
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
             setShowFilterPage(true);
           }}
         >
-          <Text style={styles.filterButtonText}>⋮</Text>
+          <Text style={styles.filterButtonText}>Filter</Text>
         </TouchableOpacity>
       </View>
+      
+      {/* Active Filter Indicator */}
+      {filterByCategory && (
+        <View style={styles.activeFilterIndicator}>
+          <View style={[
+            styles.categoryColorDot, 
+            { backgroundColor: categories.find(c => c.id === filterByCategory)?.color || '#007bff' }
+          ]} />
+          <Text style={styles.activeFilterText}>
+            {categories.find(c => c.id === filterByCategory)?.name || 'Unknown'}
+          </Text>
+          <TouchableOpacity 
+            style={styles.clearFilterButton}
+            onPress={() => setFilterByCategory(null)}
+          >
+            <Text style={styles.clearFilterButtonText}>✕</Text>
+          </TouchableOpacity>
+        </View>
+      )}
       
       {/* Share Intent Status */}
       {showShareBanner && shareIntent.webUrl && (() => {
@@ -840,7 +959,211 @@ export default function EmbedsScreen() {
     </TouchableOpacity>
   );
 
-  /** Renders filter page */
+  /** Renders clip details modal */
+  const renderClipDetailsModal = () => {
+    if (!selectedClipForDetails) return null;
+
+    const handleCategoryToggle = (categoryId: string) => {
+      const newSelected = new Set(selectedCategories);
+      if (newSelected.has(categoryId)) {
+        newSelected.delete(categoryId);
+      } else {
+        newSelected.add(categoryId);
+      }
+      setSelectedCategories(newSelected);
+    };
+
+    const handleSaveCategories = () => {
+      updateEmbedCategories(selectedClipForDetails.id, Array.from(selectedCategories));
+      setShowClipDetails(false);
+      setSelectedClipForDetails(null);
+    };
+
+    const handleDeleteClip = () => {
+      Alert.alert(
+        'Delete Clip',
+        'Are you sure you want to delete this clip? This action cannot be undone.',
+        [
+          { text: 'Cancel', style: 'cancel' },
+          { 
+            text: 'Delete', 
+            style: 'destructive', 
+            onPress: () => {
+              deleteEmbed(selectedClipForDetails.id);
+              setShowClipDetails(false);
+              setSelectedClipForDetails(null);
+            }
+          }
+        ]
+      );
+    };
+
+    return (
+      <Modal
+        visible={showClipDetails}
+        animationType="slide"
+        presentationStyle="pageSheet"
+        onRequestClose={() => setShowClipDetails(false)}
+      >
+        <View style={styles.modalContainer}>
+          <StatusBar style="light" />
+          <View style={styles.modalHeader}>
+            <TouchableOpacity 
+              style={styles.modalCloseButton}
+              onPress={() => setShowClipDetails(false)}
+            >
+              <Text style={styles.modalCloseButtonText}>✕</Text>
+            </TouchableOpacity>
+            <Text style={styles.modalTitle}>Clip Details</Text>
+            <View style={styles.modalHeaderActions}>
+              <TouchableOpacity 
+                style={styles.modalDeleteButton}
+                onPress={handleDeleteClip}
+              >
+                <Text style={styles.modalDeleteButtonText}>🗑️</Text>
+              </TouchableOpacity>
+              <TouchableOpacity 
+                style={styles.modalSaveButton}
+                onPress={handleSaveCategories}
+              >
+                <Text style={styles.modalSaveButtonText}>Save</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+
+          <ScrollView style={styles.modalContent}>
+            <View style={styles.clipInfo}>
+              <Text style={styles.clipTitle}>{selectedClipForDetails.title}</Text>
+              <Text style={styles.clipSubtitle}>{selectedClipForDetails.subtitle}</Text>
+              <Text style={styles.clipUrl}>{selectedClipForDetails.url}</Text>
+            </View>
+
+            <View style={styles.categoriesSection}>
+              <View style={styles.categoriesHeader}>
+                <Text style={styles.categoriesTitle}>Categories</Text>
+                <TouchableOpacity 
+                  style={styles.manageCategoriesButton}
+                  onPress={() => setShowCategoryManager(true)}
+                >
+                  <Text style={styles.manageCategoriesButtonText}>Manage</Text>
+                </TouchableOpacity>
+              </View>
+
+              <View style={styles.categoriesList}>
+                {categories.map(category => {
+                  const isSelected = selectedCategories.has(category.id);
+                  return (
+                    <TouchableOpacity
+                      key={category.id}
+                      style={[
+                        styles.categoryChip,
+                        isSelected && styles.categoryChipSelected,
+                        { borderColor: category.color }
+                      ]}
+                      onPress={() => handleCategoryToggle(category.id)}
+                    >
+                      <View style={[styles.categoryColorDot, { backgroundColor: category.color }]} />
+                      <Text style={[
+                        styles.categoryChipText,
+                        isSelected && styles.categoryChipTextSelected
+                      ]}>
+                        {category.name}
+                      </Text>
+                    </TouchableOpacity>
+                  );
+                })}
+              </View>
+            </View>
+          </ScrollView>
+        </View>
+      </Modal>
+    );
+  };
+
+  /** Renders category manager modal */
+  const renderCategoryManagerModal = () => {
+    const handleCreateCategory = () => {
+      if (newCategoryName.trim()) {
+        createCategory(newCategoryName);
+      }
+    };
+
+    const handleDeleteCategory = (categoryId: string) => {
+      Alert.alert(
+        'Delete Category',
+        'Are you sure you want to delete this category? This will remove it from all clips.',
+        [
+          { text: 'Cancel', style: 'cancel' },
+          { text: 'Delete', style: 'destructive', onPress: () => deleteCategory(categoryId) }
+        ]
+      );
+    };
+
+    return (
+      <Modal
+        visible={showCategoryManager}
+        animationType="slide"
+        presentationStyle="pageSheet"
+        onRequestClose={() => setShowCategoryManager(false)}
+      >
+        <View style={styles.modalContainer}>
+          <StatusBar style="light" />
+          <View style={styles.modalHeader}>
+            <TouchableOpacity 
+              style={styles.modalCloseButton}
+              onPress={() => setShowCategoryManager(false)}
+            >
+              <Text style={styles.modalCloseButtonText}>✕</Text>
+            </TouchableOpacity>
+            <Text style={styles.modalTitle}>Manage Categories</Text>
+            <View style={styles.modalHeaderSpacer} />
+          </View>
+
+          <ScrollView style={styles.modalContent}>
+            <View style={styles.addCategorySection}>
+              <Text style={styles.addCategoryTitle}>Add New Category</Text>
+              <View style={styles.addCategoryInput}>
+                <TextInput
+                  style={styles.categoryInput}
+                  placeholder="Category name"
+                  placeholderTextColor="#666"
+                  value={newCategoryName}
+                  onChangeText={setNewCategoryName}
+                />
+                <TouchableOpacity 
+                  style={styles.addCategoryButton}
+                  onPress={handleCreateCategory}
+                >
+                  <Text style={styles.addCategoryButtonText}>Add</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+
+            <View style={styles.existingCategoriesSection}>
+              <Text style={styles.existingCategoriesTitle}>Existing Categories</Text>
+              {categories.map(category => (
+                <View key={category.id} style={styles.categoryItem}>
+                  <View style={styles.categoryItemInfo}>
+                    <View style={[styles.categoryColorDot, { backgroundColor: category.color }]} />
+                    <Text style={styles.categoryItemName}>{category.name}</Text>
+                  </View>
+                  <TouchableOpacity 
+                    style={styles.deleteCategoryButton}
+                    onPress={() => handleDeleteCategory(category.id)}
+                  >
+                    <Text style={styles.deleteCategoryButtonText}>🗑️</Text>
+                  </TouchableOpacity>
+                </View>
+              ))}
+            </View>
+          </ScrollView>
+        </View>
+      </Modal>
+    );
+  };
+
+
+  /** Renders combined filter page */
   const renderFilterPage = () => {
     const sites = [
       { key: 'youtube', label: 'YouTube', icon: '📺', color: '#FF0000' },
@@ -849,7 +1172,6 @@ export default function EmbedsScreen() {
     ];
 
     const toggleSite = (siteKey: string) => {
-      // Add haptic feedback
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
       
       const newSelectedSites = new Set(selectedSites);
@@ -859,6 +1181,10 @@ export default function EmbedsScreen() {
         newSelectedSites.add(siteKey);
       }
       setSelectedSites(newSelectedSites);
+    };
+
+    const handleCategorySelect = (categoryId: string | null) => {
+      setFilterByCategory(categoryId);
     };
 
     const ToggleSwitch = ({ isActive }: { isActive: boolean }) => (
@@ -884,25 +1210,75 @@ export default function EmbedsScreen() {
             <Text style={styles.filterTitle}>Filter Clips</Text>
           </View>
           
-          <View style={styles.filterSection}>
-            <Text style={styles.filterSectionTitle}>Platforms</Text>
-            {sites.map(site => {
-              const isSelected = selectedSites.has(site.key);
-              return (
+          <ScrollView 
+            style={styles.filterContent}
+            contentContainerStyle={styles.filterScrollContent}
+          >
+            {/* Platform Filter Section */}
+            <View style={styles.filterSection}>
+              <Text style={styles.filterSectionTitle}>Platforms</Text>
+              {sites.map(site => {
+                const isSelected = selectedSites.has(site.key);
+                return (
+                  <TouchableOpacity
+                    key={site.key}
+                    style={[styles.filterOption, isSelected && styles.filterOptionSelected]}
+                    onPress={() => toggleSite(site.key)}
+                  >
+                    <Text style={[styles.filterOptionIcon, { color: site.color }]}>{site.icon}</Text>
+                    <Text style={[styles.filterOptionText, isSelected && styles.filterOptionTextSelected]}>
+                      {site.label}
+                    </Text>
+                    <ToggleSwitch isActive={isSelected} />
+                  </TouchableOpacity>
+                );
+              })}
+            </View>
+
+            {/* Category Filter Section */}
+            <View style={styles.filterSection}>
+              <Text style={styles.filterSectionTitle}>Categories</Text>
+              
+              <TouchableOpacity
+                style={[
+                  styles.categoryFilterOption,
+                  !filterByCategory && styles.categoryFilterOptionSelected
+                ]}
+                onPress={() => handleCategorySelect(null)}
+              >
+                <Text style={[
+                  styles.categoryFilterOptionText,
+                  !filterByCategory && styles.categoryFilterOptionTextSelected
+                ]}>
+                  All Categories
+                </Text>
+              </TouchableOpacity>
+
+              {categories.map(category => (
                 <TouchableOpacity
-                  key={site.key}
-                  style={[styles.filterOption, isSelected && styles.filterOptionSelected]}
-                  onPress={() => toggleSite(site.key)}
+                  key={category.id}
+                  style={[
+                    styles.categoryFilterOption,
+                    filterByCategory === category.id && styles.categoryFilterOptionSelected
+                  ]}
+                  onPress={() => handleCategorySelect(category.id)}
                 >
-                  <Text style={[styles.filterOptionIcon, { color: site.color }]}>{site.icon}</Text>
-                  <Text style={[styles.filterOptionText, isSelected && styles.filterOptionTextSelected]}>
-                    {site.label}
+                  <View style={styles.categoryFilterOptionInfo}>
+                    <View style={[styles.categoryColorDot, { backgroundColor: category.color }]} />
+                    <Text style={[
+                      styles.categoryFilterOptionText,
+                      filterByCategory === category.id && styles.categoryFilterOptionTextSelected
+                    ]}>
+                      {category.name}
+                    </Text>
+                  </View>
+                  <Text style={styles.categoryCount}>
+                    {allEmbeds.filter(embed => embed.categories?.includes(category.id)).length}
                   </Text>
-                  <ToggleSwitch isActive={isSelected} />
                 </TouchableOpacity>
-              );
-            })}
-          </View>
+              ))}
+            </View>
+          </ScrollView>
         </View>
       </View>
     );
@@ -981,13 +1357,13 @@ export default function EmbedsScreen() {
     return renderFilterPage();
   }
 
-  return active === 'menu' ? (
+  return (
     <View style={styles.container}>
       <StatusBar style="light" />
-      {renderMenu()}
+      {active === 'menu' ? renderMenu() : renderWebView()}
+      {renderClipDetailsModal()}
+      {renderCategoryManagerModal()}
     </View>
-  ) : (
-    renderWebView()
   );
 }
 
