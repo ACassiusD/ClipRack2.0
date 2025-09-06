@@ -379,10 +379,14 @@ export default function EmbedsScreen() {
   const [isLoading, setIsLoading] = React.useState(true);
   const [tiktokThumbnails, setTiktokThumbnails] = React.useState<Record<string, string>>({});
   const [loadingThumbnails, setLoadingThumbnails] = React.useState<Set<string>>(new Set());
+  const [loadingInstagramEmbeds, setLoadingInstagramEmbeds] = React.useState<Set<string>>(new Set());
   const [showShareBanner, setShowShareBanner] = React.useState(false);
   const [showFilterPage, setShowFilterPage] = React.useState(false);
   const [selectedSites, setSelectedSites] = React.useState<Set<string>>(new Set(['youtube', 'tiktok', 'instagram']));
   const [refreshing, setRefreshing] = React.useState(false);
+  
+  // Ref to track if thumbnails have been loaded to prevent Strict Mode double execution
+  const thumbnailsLoadedRef = React.useRef(false);
   
   const { hasShareIntent, shareIntent, resetShareIntent } = useShareIntentContext();
 
@@ -402,41 +406,55 @@ export default function EmbedsScreen() {
     
     // Fetch TikTok thumbnails
     for (const embed of tiktokEmbeds) {
-      if (embed.postId && !tiktokThumbnails[embed.postId] && !loadingThumbnails.has(embed.postId)) {
-        console.log('🔄 Fetching TikTok thumbnail for:', embed.postId);
-        
-        // Mark as loading
-        setLoadingThumbnails(prev => new Set([...prev, embed.postId!]));
-        
-        try {
-          const thumbnailUrl = await fetchTikTokThumbnail(embed.postId, embed.isShortUrl);
-          if (thumbnailUrl) {
-            setTiktokThumbnails(prev => ({
-              ...prev,
-              [embed.postId!]: thumbnailUrl
-            }));
-          }
-        } catch (error) {
-          console.error('Failed to fetch TikTok thumbnail for:', embed.postId, error);
-        } finally {
-          // Remove from loading state
-          setLoadingThumbnails(prev => {
-            const newSet = new Set(prev);
-            newSet.delete(embed.postId!);
-            return newSet;
+      if (embed.postId) {
+        // Check current state values directly instead of relying on closure
+        setTiktokThumbnails(currentThumbnails => {
+          setLoadingThumbnails(currentLoading => {
+            if (!currentThumbnails[embed.postId!] && !currentLoading.has(embed.postId!)) {
+              console.log('🔄 Fetching TikTok thumbnail for:', embed.postId);
+              
+              // Mark as loading
+              const newLoading = new Set([...currentLoading, embed.postId!]);
+              setLoadingThumbnails(newLoading);
+              
+              // Fetch thumbnail asynchronously
+              fetchTikTokThumbnail(embed.postId!, Boolean(embed.isShortUrl))
+                .then(thumbnailUrl => {
+                  if (thumbnailUrl) {
+                    setTiktokThumbnails(prev => ({
+                      ...prev,
+                      [embed.postId!]: thumbnailUrl
+                    }));
+                  }
+                })
+                .catch(error => {
+                  console.error('Failed to fetch TikTok thumbnail for:', embed.postId, error);
+                })
+                .finally(() => {
+                  // Remove from loading state
+                  setLoadingThumbnails(prev => {
+                    const newSet = new Set(prev);
+                    newSet.delete(embed.postId!);
+                    return newSet;
+                  });
+                });
+            }
+            return currentLoading;
           });
-        }
+          return currentThumbnails;
+        });
       }
     }
-  }, [tiktokThumbnails, loadingThumbnails]);
+  }, []); // Remove dependencies to prevent re-creation
 
 
   // Initial load: fetch thumbnails for all embeds on first load
   React.useEffect(() => {
-    if (!isLoading && dynamicEmbeds.length > 0) {
+    if (!isLoading && dynamicEmbeds.length > 0 && !thumbnailsLoadedRef.current) {
+      thumbnailsLoadedRef.current = true;
       fetchThumbnailsForEmbeds([...STARTER_EMBEDS, ...dynamicEmbeds]);
     }
-  }, [isLoading, fetchThumbnailsForEmbeds]);
+  }, [isLoading, dynamicEmbeds, fetchThumbnailsForEmbeds]);
 
   /** Removes embed from state and AsyncStorage */
   const deleteEmbed = async (embedId: string): Promise<void> => {
@@ -454,6 +472,9 @@ export default function EmbedsScreen() {
   const onRefresh = React.useCallback(async () => {
     setRefreshing(true);
     try {
+      // Reset the thumbnails loaded flag
+      thumbnailsLoadedRef.current = false;
+      
       // Reload saved embeds
       const saved = await loadDynamicEmbeds();
       setDynamicEmbeds(saved);
@@ -461,6 +482,7 @@ export default function EmbedsScreen() {
       // Clear thumbnails to force re-fetch
       setTiktokThumbnails({});
       setLoadingThumbnails(new Set());
+      setLoadingInstagramEmbeds(new Set());
       
       // Re-fetch all thumbnails
       fetchThumbnailsForEmbeds([...STARTER_EMBEDS, ...saved]);
@@ -517,7 +539,7 @@ export default function EmbedsScreen() {
       
       processShareIntent();
     }
-  }, [hasShareIntent, shareIntent.webUrl, dynamicEmbeds]);
+  }, [hasShareIntent, shareIntent.webUrl, dynamicEmbeds, fetchThumbnailsForEmbeds]);
 
   // Combine starter embeds with dynamic embeds, with dynamic embeds always on top, then apply filters
   const allEmbeds = [...dynamicEmbeds, ...STARTER_EMBEDS]
@@ -543,6 +565,8 @@ export default function EmbedsScreen() {
     isMostRecent: boolean; 
     thumbnailUrl: string | null; 
   }) => {
+    // Create a stable ref for Instagram WebViews to prevent unnecessary re-mounts
+    const webViewRef = React.useRef<WebView>(null);
 
     // Get platform display name and color
     const getPlatformInfo = (type: string) => {
@@ -570,7 +594,8 @@ export default function EmbedsScreen() {
             {embed.type === 'instagram' ? (
               // Instagram: Use WebView embed
               <WebView
-                key={`instagram-${embed.id}-${embed.url}`}
+                ref={webViewRef}
+                key={`instagram-${embed.id}-${embed.postId}`}
                 source={{ 
                   uri: `${embed.url.replace(/\/$/, '')}/embed`,
                   headers: {
@@ -587,16 +612,34 @@ export default function EmbedsScreen() {
                 mediaPlaybackRequiresUserAction={true}
                 allowsFullscreenVideo={false}
                 onLoadStart={() => {
-                  console.log('🔄 Instagram embed loading:', embed.url);
+                  if (!loadingInstagramEmbeds.has(embed.id)) {
+                    console.log('🔄 Instagram embed loading:', embed.url);
+                    setLoadingInstagramEmbeds(prev => new Set([...prev, embed.id]));
+                  }
                 }}
                 onLoadEnd={() => {
                   console.log('✅ Instagram embed loaded successfully');
+                  setLoadingInstagramEmbeds(prev => {
+                    const newSet = new Set(prev);
+                    newSet.delete(embed.id);
+                    return newSet;
+                  });
                 }}
                 onError={(syntheticEvent) => {
                   console.log('❌ Instagram embed error:', syntheticEvent.nativeEvent);
+                  setLoadingInstagramEmbeds(prev => {
+                    const newSet = new Set(prev);
+                    newSet.delete(embed.id);
+                    return newSet;
+                  });
                 }}
                 onHttpError={(syntheticEvent) => {
                   console.log('🌐 Instagram embed HTTP error:', syntheticEvent.nativeEvent);
+                  setLoadingInstagramEmbeds(prev => {
+                    const newSet = new Set(prev);
+                    newSet.delete(embed.id);
+                    return newSet;
+                  });
                 }}
               />
             ) : thumbnailUrl ? (
@@ -678,7 +721,7 @@ export default function EmbedsScreen() {
     );
   }, (prevProps, nextProps) => {
     // Only re-render if the embed data actually changed
-    return prevProps.item.id === nextProps.item.id && 
+    const isEqual = prevProps.item.id === nextProps.item.id && 
            prevProps.item.url === nextProps.item.url &&
            prevProps.item.type === nextProps.item.type &&
            prevProps.item.createdAt === nextProps.item.createdAt &&
@@ -686,10 +729,15 @@ export default function EmbedsScreen() {
            prevProps.item.videoId === nextProps.item.videoId &&
            prevProps.isMostRecent === nextProps.isMostRecent &&
            prevProps.thumbnailUrl === nextProps.thumbnailUrl;
+    
+    // Return true if props are equal (don't re-render), false if different (re-render)
+    return isEqual;
   });
 
+  ClipCard.displayName = 'ClipCard';
+
   /** Render function for FlatList */
-  const renderClipCard = ({ item }: { item: EmbedData }) => {
+  const renderClipCard = React.useCallback(({ item }: { item: EmbedData }) => {
     // Calculate values outside the memoized component
     const isMostRecent = dynamicEmbeds.length > 0 && 
       dynamicEmbeds[dynamicEmbeds.length - 1].id === item.id;
@@ -700,7 +748,7 @@ export default function EmbedsScreen() {
     }
     
     return <ClipCard item={item} isMostRecent={isMostRecent} thumbnailUrl={thumbnailUrl} />;
-  };
+  }, [dynamicEmbeds, tiktokThumbnails]); // eslint-disable-line react-hooks/exhaustive-deps
 
   /** Renders main grid view with all clips */
   const renderMenu = () => (
@@ -755,7 +803,7 @@ export default function EmbedsScreen() {
         <FlatList
           data={allEmbeds}
           renderItem={renderClipCard}
-          keyExtractor={(item) => `${item.id}-${item.url}`}
+          keyExtractor={(item) => `${item.type}-${item.id}`}
           numColumns={2}
           columnWrapperStyle={styles.row}
           contentContainerStyle={styles.gridContent}
