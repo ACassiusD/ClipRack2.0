@@ -9,6 +9,14 @@ export interface EmbedData {
   postId?: string;
   isShortUrl?: boolean; // for TikTok short URLs
   createdAt: number; // timestamp for sorting
+  categories?: string[]; // array of category IDs
+}
+
+export interface Category {
+  id: string;
+  name: string;
+  color: string;
+  createdAt: number;
 }
 
 export type Provider = 'menu' | 'youtube' | 'tiktok' | 'instagram';
