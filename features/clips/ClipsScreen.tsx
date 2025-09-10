@@ -30,12 +30,14 @@
 
 import React, { useState } from 'react'
 import { Alert, FlatList, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
+import { useEmailAuth } from '../auth/useEmailAuth'
 import { useEntitlement } from '../auth/useEntitlement'
 import { useClips } from './useClips'
 
 export default function ClipsScreen() {
   const { clips, loading, addClip } = useClips()
   const { entitlement } = useEntitlement()
+  const { signOut } = useEmailAuth()
   const [url, setUrl] = useState('')
   const [title, setTitle] = useState('')
 
@@ -61,6 +63,13 @@ export default function ClipsScreen() {
     }
   }
 
+  const handleSignOut = async () => {
+    const { error } = await signOut()
+    if (error) {
+      Alert.alert('Error', 'Failed to sign out')
+    }
+  }
+
   const renderClip = ({ item }: { item: any }) => (
     <View style={styles.clipItem}>
       <Text style={styles.clipTitle}>{item.title || 'Untitled'}</Text>
@@ -82,9 +91,14 @@ export default function ClipsScreen() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Your Clips</Text>
+      <View style={styles.header}>
+        <Text style={styles.title}>Your Clips</Text>
+        <TouchableOpacity style={styles.signOutButton} onPress={handleSignOut}>
+          <Text style={styles.signOutText}>Sign Out</Text>
+        </TouchableOpacity>
+      </View>
       <Text style={styles.subtitle}>
-        Status: {entitlement.is_premium ? 'Premium' : 'Free'} 
+        Account Status: {entitlement.is_premium ? 'Premium' : 'Free'} 
         {entitlement.is_premium ? ` (${entitlement.plan})` : ''}
       </Text>
 
@@ -131,10 +145,25 @@ const styles = StyleSheet.create({
     padding: 20,
     backgroundColor: '#fff',
   },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
-    marginBottom: 8,
+  },
+  signOutButton: {
+    backgroundColor: '#ff4444',
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 6,
+  },
+  signOutText: {
+    color: '#fff',
+    fontWeight: '600',
   },
   subtitle: {
     fontSize: 16,

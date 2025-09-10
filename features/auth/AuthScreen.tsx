@@ -81,7 +81,7 @@ export default function AuthScreen() {
       <View style={styles.container}>
         <Text style={styles.title}>Welcome to ClipRack!</Text>
         <Text style={styles.subtitle}>
-          Status: {entitlement.is_premium ? 'Premium' : 'Free'}
+          Account Status: {entitlement.is_premium ? 'Premium' : 'Free'}
         </Text>
         <Text style={styles.subtitle}>
           Plan: {entitlement.plan || 'None'}
@@ -101,6 +101,7 @@ export default function AuthScreen() {
         <TextInput
           style={styles.input}
           placeholder="Email"
+          placeholderTextColor="#999"
           value={email}
           onChangeText={setEmail}
           keyboardType="email-address"
@@ -109,6 +110,7 @@ export default function AuthScreen() {
         <TextInput
           style={styles.input}
           placeholder="Password"
+          placeholderTextColor="#999"
           value={password}
           onChangeText={setPassword}
           secureTextEntry
@@ -175,6 +177,9 @@ const styles = StyleSheet.create({
     padding: 12,
     marginBottom: 16,
     fontSize: 16,
+    color: '#000000',
+    backgroundColor: '#ffffff',
+    textAlign: 'left',
   },
   button: {
     backgroundColor: '#007AFF',
