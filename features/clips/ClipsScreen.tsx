@@ -28,6 +28,7 @@
  * ```
  */
 
+import { useSession } from '@/hooks/useSession'
 import React, { useState } from 'react'
 import { Alert, FlatList, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
 import { useEmailAuth } from '../auth/useEmailAuth'
@@ -35,6 +36,7 @@ import { useEntitlement } from '../auth/useEntitlement'
 import { useClips } from './useClips'
 
 export default function ClipsScreen() {
+  const { session } = useSession()
   const { clips, loading, addClip } = useClips()
   const { entitlement } = useEntitlement()
   const { signOut } = useEmailAuth()
@@ -98,8 +100,14 @@ export default function ClipsScreen() {
         </TouchableOpacity>
       </View>
       <Text style={styles.subtitle}>
-        Account Status: {entitlement.is_premium ? 'Premium' : 'Free'} 
+        <Text style={styles.boldText}>Email:</Text> {session?.user?.email || 'Unknown'}
+      </Text>
+      <Text style={styles.subtitle}>
+        <Text style={styles.boldText}>Account Status:</Text> {entitlement.is_premium ? 'Premium' : 'Free'} 
         {entitlement.is_premium ? ` (${entitlement.plan})` : ''}
+      </Text>
+      <Text style={styles.subtitle}>
+        <Text style={styles.boldText}>Storage:</Text> {entitlement.is_premium ? 'Cloud (Supabase) + Local Cache' : 'Local Only (AsyncStorage)'}
       </Text>
 
       {entitlement.is_premium && (
@@ -169,6 +177,15 @@ const styles = StyleSheet.create({
     fontSize: 16,
     marginBottom: 20,
     color: '#666',
+  },
+  storageInfo: {
+    fontSize: 14,
+    marginBottom: 20,
+    color: '#888',
+    fontStyle: 'italic',
+  },
+  boldText: {
+    fontWeight: 'bold',
   },
   addForm: {
     marginBottom: 20,
