@@ -39,7 +39,11 @@
             "NSExtensionActivationSupportsMovieWithMaxCount": 1,
             "NSExtensionActivationSupportsText": true
           },
-          "androidIntentFilters": ["text/*", "image/*", "video/*"],
+          "androidIntentFilters": [
+            "text/*",
+            "image/*",
+            "video/*"
+          ],
           "iosShareExtension": {
             "bundleIdentifier": "com.alexdonnelly.ClipRackApp.share-extension"
           }
@@ -54,10 +58,17 @@
           "resizeMode": "contain",
           "backgroundColor": "#ffffff"
         }
-      ]
+      ],
+      "expo-secure-store"
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "expoPublic": {
+        "SUPABASE_URL": "$EXPO_PUBLIC_SUPABASE_URL",
+        "SUPABASE_ANON_KEY": "$EXPO_PUBLIC_SUPABASE_ANON_KEY"
+      }
     }
   }
 }
