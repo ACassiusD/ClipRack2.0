@@ -15,6 +15,7 @@ import { Alert, FlatList, Image, Modal, RefreshControl, ScrollView, Text, TextIn
 import { WebView } from 'react-native-webview';
 
 import { IconSymbol } from '../../components/ui/IconSymbol';
+import { useSharedContent } from '../../hooks/useSharedContent';
 import { CATEGORY_COLORS, DEFAULT_CATEGORIES, STARTER_EMBEDS, STORAGE_KEYS } from '../../src/embeds/constants';
 import { styles } from '../../src/embeds/styles';
 import { Category, EmbedData, Provider } from '../../src/embeds/types';
@@ -279,6 +280,8 @@ export default function EmbedsScreen() {
   // Ref to track if thumbnails have been loaded to prevent Strict Mode double execution
   const thumbnailsLoadedRef = React.useRef(false);
   
+  // Shared content hook
+  const { sharedContent } = useSharedContent();
 
   // Load saved dynamic embeds and categories on component mount
   React.useEffect(() => {
@@ -1165,6 +1168,34 @@ export default function EmbedsScreen() {
     }
   };
 
+  // Process shared content from share extension
+  React.useEffect(() => {
+    const processSharedContent = async () => {
+      if (sharedContent.length > 0) {
+        for (const content of sharedContent) {
+          if (content.url) {
+            // Parse URL and create embed
+            const embed = await createEmbedFromUrl(content.url);
+            if (embed) {
+              // Check if this embed already exists
+              const exists = dynamicEmbeds.some(e => e.url === embed.url);
+              if (!exists) {
+                const newEmbeds = [...dynamicEmbeds, embed];
+                setDynamicEmbeds(newEmbeds);
+                await saveDynamicEmbeds(newEmbeds);
+                console.log('💾 Saved shared content as embed');
+              }
+            }
+          }
+        }
+        // Clear shared content after processing
+        // await clearSharedContent();
+      }
+    };
+    
+    processSharedContent();
+  }, [sharedContent, dynamicEmbeds]);
+
   if (showFilterPage) {
     return renderFilterPage();
   }
@@ -1178,5 +1209,105 @@ export default function EmbedsScreen() {
     </View>
   );
 }
+
+// URL parsing functions
+const parseInstagramUrl = (url: string): { postId: string; username?: string; contentType: 'post' | 'reel' } | null => {
+  const instagramRegex = /(?:https?:\/\/(?:www\.)?instagram\.com(?:\/[^\/]+)?\/(p|reel)\/([^\/\?]+))/;
+  const match = url.match(instagramRegex);
+  
+  if (match) {
+    const contentType = match[1] as 'post' | 'reel';
+    const postId = match[2];
+    const usernameMatch = url.match(/instagram\.com\/([^\/]+)\/(p|reel)\//);
+    const username = usernameMatch ? usernameMatch[1] : undefined;
+    
+    return { postId, username, contentType };
+  }
+  
+  return null;
+};
+
+const parseYouTubeUrl = (url: string): { videoId: string } | null => {
+  const youtubeRegex = /(?:https?:\/\/(?:www\.)?youtube\.com\/(?:watch\?v=|shorts\/)|https?:\/\/youtu\.be\/)([^&\n?#]+)/;
+  const match = url.match(youtubeRegex);
+  
+  if (match) {
+    return { videoId: match[1] };
+  }
+  
+  return null;
+};
+
+const parseTikTokUrl = (url: string): { postId: string; username?: string; isShortUrl?: boolean } | null => {
+  const fullTiktokRegex = /(?:https?:\/\/(?:www\.)?tiktok\.com\/@([^\/]+)\/video\/([^\/\?]+))/;
+  const shortTiktokRegex = /(?:https?:\/\/vt\.tiktok\.com\/([^\/\?]+))/;
+  
+  const fullMatch = url.match(fullTiktokRegex);
+  if (fullMatch) {
+    const username = fullMatch[1];
+    const postId = fullMatch[2];
+    return { postId, username };
+  }
+  
+  const shortMatch = url.match(shortTiktokRegex);
+  if (shortMatch) {
+    const shortId = shortMatch[1];
+    return { postId: shortId, isShortUrl: true };
+  }
+  
+  return null;
+};
+
+const createEmbedFromUrl = async (url: string): Promise<EmbedData | null> => {
+  const instagramData = parseInstagramUrl(url);
+  if (instagramData) {
+    const contentType = instagramData.contentType === 'reel' ? 'Reel' : 'Post';
+    const cleanUrl = instagramData.contentType === 'reel' 
+      ? `https://www.instagram.com/p/${instagramData.postId}/`
+      : url;
+    
+    return {
+      id: `instagram-${instagramData.postId}-${Date.now()}`,
+      type: 'instagram',
+      title: `Instagram ${contentType}`,
+      subtitle: instagramData.username ? `@${instagramData.username}` : instagramData.postId,
+      url: cleanUrl,
+      postId: instagramData.postId,
+      username: instagramData.username,
+      createdAt: Date.now()
+    };
+  }
+  
+  const youtubeData = parseYouTubeUrl(url);
+  if (youtubeData) {
+    const isShorts = url.includes('/shorts/');
+    return {
+      id: `youtube-${youtubeData.videoId}-${Date.now()}`,
+      type: 'youtube',
+      title: isShorts ? 'YouTube Short' : 'YouTube Video',
+      subtitle: `Open ${youtubeData.videoId}`,
+      url: url,
+      videoId: youtubeData.videoId,
+      createdAt: Date.now()
+    };
+  }
+  
+  const tiktokData = parseTikTokUrl(url);
+  if (tiktokData) {
+    return {
+      id: `tiktok-${tiktokData.postId}-${Date.now()}`,
+      type: 'tiktok',
+      title: 'TikTok Video',
+      subtitle: tiktokData.username ? `@${tiktokData.username}` : (tiktokData.isShortUrl ? 'Short URL' : tiktokData.postId),
+      url: url,
+      postId: tiktokData.postId,
+      username: tiktokData.username,
+      isShortUrl: tiktokData.isShortUrl,
+      createdAt: Date.now()
+    };
+  }
+  
+  return null;
+};
 
 

@@ -8,28 +8,74 @@
 
 /* Begin PBXBuildFile section */
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
-		161E66E22D90485DC99106A6 /* ExpoModulesProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 08A1C3B200CA9A2B0C788974 /* ExpoModulesProvider.swift */; };
 		3E461D99554A48A4959DE609 /* SplashScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AA286B85B6C04FC6940260E9 /* SplashScreen.storyboard */; };
+		4B78C474D61FFD522EC8EF56 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 5BCE5E92381CF7A80C8EB745 /* PrivacyInfo.xcprivacy */; };
+		6DC53D1805FDF844F67DB4C9 /* ExpoModulesProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = C627FD61CD1DB35C2CF68DF5 /* ExpoModulesProvider.swift */; };
+		757E8F03B2B38479D3C78795 /* libPods-ClipRack.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 7863C44FAF5BF794D4DFB9C4 /* libPods-ClipRack.a */; };
+		78FB35E439F444D292E04C3A /* ShareExtensionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A54D289233AA4FF69CEF9ACC /* ShareExtensionViewController.swift */; };
 		BB2F792D24A3F905000567C9 /* Expo.plist in Resources */ = {isa = PBXBuildFile; fileRef = BB2F792C24A3F905000567C9 /* Expo.plist */; };
-		D0D62C84E0C173774DF0D9AB /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 653D028198AD6F0FB9AEEC34 /* PrivacyInfo.xcprivacy */; };
-		E7B572891DA3A626C03AE149 /* libPods-ClipRack.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F35145EB2021F7B59C0BE6BB /* libPods-ClipRack.a */; };
+		CEFA59FF0DA959231D29C265 /* ExpoModulesProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8CD6E26ACA8CD02030D2BD30 /* ExpoModulesProvider.swift */; };
+		D44210795BDA4C9F80090F66 /* ClipRackShareExtension.appex in Copy Files */ = {isa = PBXBuildFile; fileRef = 3C719E1B17334C3CAFD60F3D /* ClipRackShareExtension.appex */; };
+		E002BE3848AC0C0872EB4A2B /* libPods-ClipRackShareExtension.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4EDFE993421FCDE07EF14C73 /* libPods-ClipRackShareExtension.a */; };
 		F11748422D0307B40044C1D9 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F11748412D0307B40044C1D9 /* AppDelegate.swift */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXContainerItemProxy section */
+		2C0122078695480A9DF0305E /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 83CBB9F71A601CBA00E9B192 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = B5EA23197EB342D28EBA3884;
+			remoteInfo = ClipRackShareExtension;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		4336A71FD8CB4537A4A550CC /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		801B5F24E89249318B849C21 /* Copy Files */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				D44210795BDA4C9F80090F66 /* ClipRackShareExtension.appex in Copy Files */,
+			);
+			name = "Copy Files";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
-		08A1C3B200CA9A2B0C788974 /* ExpoModulesProvider.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ExpoModulesProvider.swift; path = "Pods/Target Support Files/Pods-ClipRack/ExpoModulesProvider.swift"; sourceTree = "<group>"; };
+		04B7062AE77040D1ACE5C1F1 /* Pods-ClipRackShareExtension.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ClipRackShareExtension.debug.xcconfig"; path = "Target Support Files/Pods-ClipRackShareExtension/Pods-ClipRackShareExtension.debug.xcconfig"; sourceTree = "<group>"; };
 		13B07F961A680F5B00A75B9A /* ClipRack.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ClipRack.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		13B07FB51A68108700A75B9A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = ClipRack/Images.xcassets; sourceTree = "<group>"; };
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = ClipRack/Info.plist; sourceTree = "<group>"; };
-		34BDBFAF2F6A70F9FD458BFE /* Pods-ClipRack.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ClipRack.release.xcconfig"; path = "Target Support Files/Pods-ClipRack/Pods-ClipRack.release.xcconfig"; sourceTree = "<group>"; };
-		653D028198AD6F0FB9AEEC34 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; name = PrivacyInfo.xcprivacy; path = ClipRack/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		2B051B9D1B5BDABDB8257B5E /* Pods-ClipRack.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ClipRack.debug.xcconfig"; path = "Target Support Files/Pods-ClipRack/Pods-ClipRack.debug.xcconfig"; sourceTree = "<group>"; };
+		3BDD5E794527CD95E295F10B /* Pods-ClipRackShareExtension.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ClipRackShareExtension.release.xcconfig"; path = "Target Support Files/Pods-ClipRackShareExtension/Pods-ClipRackShareExtension.release.xcconfig"; sourceTree = "<group>"; };
+		3C719E1B17334C3CAFD60F3D /* ClipRackShareExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = undefined; name = ClipRackShareExtension.appex; path = ClipRackShareExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		4EDFE993421FCDE07EF14C73 /* libPods-ClipRackShareExtension.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-ClipRackShareExtension.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		54E50263451F43A7B57172BD /* Info.plist */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 4; includeInIndex = 0; lastKnownFileType = text.plist.xml; name = Info.plist; path = Info.plist; sourceTree = "<group>"; };
+		5BCE5E92381CF7A80C8EB745 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; name = PrivacyInfo.xcprivacy; path = ClipRack/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		7863C44FAF5BF794D4DFB9C4 /* libPods-ClipRack.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-ClipRack.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		8CD6E26ACA8CD02030D2BD30 /* ExpoModulesProvider.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ExpoModulesProvider.swift; path = "Pods/Target Support Files/Pods-ClipRackShareExtension/ExpoModulesProvider.swift"; sourceTree = "<group>"; };
+		A54D289233AA4FF69CEF9ACC /* ShareExtensionViewController.swift */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 4; includeInIndex = 0; lastKnownFileType = sourcecode.swift; name = ShareExtensionViewController.swift; path = ShareExtensionViewController.swift; sourceTree = "<group>"; };
 		AA286B85B6C04FC6940260E9 /* SplashScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = SplashScreen.storyboard; path = ClipRack/SplashScreen.storyboard; sourceTree = "<group>"; };
+		B0138F36B4B34FA794ABBB01 /* ClipRackShareExtension.entitlements */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = ClipRackShareExtension.entitlements; path = ClipRackShareExtension.entitlements; sourceTree = "<group>"; };
 		BB2F792C24A3F905000567C9 /* Expo.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Expo.plist; sourceTree = "<group>"; };
-		DEE108D699A7515CB30D3756 /* Pods-ClipRack.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ClipRack.debug.xcconfig"; path = "Target Support Files/Pods-ClipRack/Pods-ClipRack.debug.xcconfig"; sourceTree = "<group>"; };
+		C627FD61CD1DB35C2CF68DF5 /* ExpoModulesProvider.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ExpoModulesProvider.swift; path = "Pods/Target Support Files/Pods-ClipRack/ExpoModulesProvider.swift"; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 		F11748412D0307B40044C1D9 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AppDelegate.swift; path = ClipRack/AppDelegate.swift; sourceTree = "<group>"; };
 		F11748442D0722820044C1D9 /* ClipRack-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "ClipRack-Bridging-Header.h"; path = "ClipRack/ClipRack-Bridging-Header.h"; sourceTree = "<group>"; };
-		F35145EB2021F7B59C0BE6BB /* libPods-ClipRack.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-ClipRack.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		F4A77ABC0601FA71DF39D46D /* Pods-ClipRack.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ClipRack.release.xcconfig"; path = "Target Support Files/Pods-ClipRack/Pods-ClipRack.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -37,7 +83,15 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E7B572891DA3A626C03AE149 /* libPods-ClipRack.a in Frameworks */,
+				757E8F03B2B38479D3C78795 /* libPods-ClipRack.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		8129C1CE326A4A83A613F864 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E002BE3848AC0C0872EB4A2B /* libPods-ClipRackShareExtension.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -53,7 +107,7 @@
 				13B07FB51A68108700A75B9A /* Images.xcassets */,
 				13B07FB61A68108700A75B9A /* Info.plist */,
 				AA286B85B6C04FC6940260E9 /* SplashScreen.storyboard */,
-				653D028198AD6F0FB9AEEC34 /* PrivacyInfo.xcprivacy */,
+				5BCE5E92381CF7A80C8EB745 /* PrivacyInfo.xcprivacy */,
 			);
 			name = ClipRack;
 			sourceTree = "<group>";
@@ -62,27 +116,22 @@
 			isa = PBXGroup;
 			children = (
 				ED297162215061F000B7C4FE /* JavaScriptCore.framework */,
-				F35145EB2021F7B59C0BE6BB /* libPods-ClipRack.a */,
+				7863C44FAF5BF794D4DFB9C4 /* libPods-ClipRack.a */,
+				4EDFE993421FCDE07EF14C73 /* libPods-ClipRackShareExtension.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
-		6223929CD7E27637A50E4C15 /* Pods */ = {
+		715583C7A4DDCDA93B1F7668 /* Pods */ = {
 			isa = PBXGroup;
 			children = (
-				DEE108D699A7515CB30D3756 /* Pods-ClipRack.debug.xcconfig */,
-				34BDBFAF2F6A70F9FD458BFE /* Pods-ClipRack.release.xcconfig */,
+				2B051B9D1B5BDABDB8257B5E /* Pods-ClipRack.debug.xcconfig */,
+				F4A77ABC0601FA71DF39D46D /* Pods-ClipRack.release.xcconfig */,
+				04B7062AE77040D1ACE5C1F1 /* Pods-ClipRackShareExtension.debug.xcconfig */,
+				3BDD5E794527CD95E295F10B /* Pods-ClipRackShareExtension.release.xcconfig */,
 			);
 			name = Pods;
 			path = Pods;
-			sourceTree = "<group>";
-		};
-		8090FBECB426388209ED051B /* ExpoModulesProviders */ = {
-			isa = PBXGroup;
-			children = (
-				99F134BF949D5F9B5366ACD7 /* ClipRack */,
-			);
-			name = ExpoModulesProviders;
 			sourceTree = "<group>";
 		};
 		832341AE1AAA6A7D00B99B32 /* Libraries */ = {
@@ -99,8 +148,9 @@
 				832341AE1AAA6A7D00B99B32 /* Libraries */,
 				83CBBA001A601CBA00E9B192 /* Products */,
 				2D16E6871FA4F8E400B85C8A /* Frameworks */,
-				6223929CD7E27637A50E4C15 /* Pods */,
-				8090FBECB426388209ED051B /* ExpoModulesProviders */,
+				909D2A04EC0E426BA297A91F /* ClipRackShareExtension */,
+				715583C7A4DDCDA93B1F7668 /* Pods */,
+				D33B2F539B99AA724ACDB190 /* ExpoModulesProviders */,
 			);
 			indentWidth = 2;
 			sourceTree = "<group>";
@@ -111,16 +161,28 @@
 			isa = PBXGroup;
 			children = (
 				13B07F961A680F5B00A75B9A /* ClipRack.app */,
+				3C719E1B17334C3CAFD60F3D /* ClipRackShareExtension.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
 		};
-		99F134BF949D5F9B5366ACD7 /* ClipRack */ = {
+		909D2A04EC0E426BA297A91F /* ClipRackShareExtension */ = {
 			isa = PBXGroup;
 			children = (
-				08A1C3B200CA9A2B0C788974 /* ExpoModulesProvider.swift */,
+				A54D289233AA4FF69CEF9ACC /* ShareExtensionViewController.swift */,
+				54E50263451F43A7B57172BD /* Info.plist */,
+				B0138F36B4B34FA794ABBB01 /* ClipRackShareExtension.entitlements */,
 			);
-			name = ClipRack;
+			name = ClipRackShareExtension;
+			path = ClipRackShareExtension;
+			sourceTree = "<group>";
+		};
+		A11B1DBC902F4E7A0B3B0756 /* ClipRackShareExtension */ = {
+			isa = PBXGroup;
+			children = (
+				8CD6E26ACA8CD02030D2BD30 /* ExpoModulesProvider.swift */,
+			);
+			name = ClipRackShareExtension;
 			sourceTree = "<group>";
 		};
 		BB2F792B24A3F905000567C9 /* Supporting */ = {
@@ -132,6 +194,23 @@
 			path = ClipRack/Supporting;
 			sourceTree = "<group>";
 		};
+		D33B2F539B99AA724ACDB190 /* ExpoModulesProviders */ = {
+			isa = PBXGroup;
+			children = (
+				F9AD4CEDB1A3F1F5A3C8D7BE /* ClipRack */,
+				A11B1DBC902F4E7A0B3B0756 /* ClipRackShareExtension */,
+			);
+			name = ExpoModulesProviders;
+			sourceTree = "<group>";
+		};
+		F9AD4CEDB1A3F1F5A3C8D7BE /* ClipRack */ = {
+			isa = PBXGroup;
+			children = (
+				C627FD61CD1DB35C2CF68DF5 /* ExpoModulesProvider.swift */,
+			);
+			name = ClipRack;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -140,22 +219,47 @@
 			buildConfigurationList = 13B07F931A680F5B00A75B9A /* Build configuration list for PBXNativeTarget "ClipRack" */;
 			buildPhases = (
 				08A4A3CD28434E44B6B9DE2E /* [CP] Check Pods Manifest.lock */,
-				B2C1E9650C1BB7ADD6D37E9F /* [Expo] Configure project */,
+				8AD9E0DF399FF4BB631D46F9 /* [Expo] Configure project */,
 				13B07F871A680F5B00A75B9A /* Sources */,
 				13B07F8C1A680F5B00A75B9A /* Frameworks */,
 				13B07F8E1A680F5B00A75B9A /* Resources */,
 				00DD1BFF1BD5951E006B06BC /* Bundle React Native code and images */,
 				800E24972A6A228C8D4807E9 /* [CP] Copy Pods Resources */,
-				07ECDA4464D015F91CBB214C /* [CP] Embed Pods Frameworks */,
+				4336A71FD8CB4537A4A550CC /* Embed Foundation Extensions */,
+				801B5F24E89249318B849C21 /* Copy Files */,
+				3740A587DE25F4AD3426E84D /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				F8A995FD74404D51A3CA2CA2 /* PBXTargetDependency */,
 			);
 			name = ClipRack;
 			productName = ClipRack;
 			productReference = 13B07F961A680F5B00A75B9A /* ClipRack.app */;
 			productType = "com.apple.product-type.application";
+		};
+		B5EA23197EB342D28EBA3884 /* ClipRackShareExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 5DF79EADF4BA4BFDADEE433F /* Build configuration list for PBXNativeTarget "ClipRackShareExtension" */;
+			buildPhases = (
+				4031F123C620D289CBC9E1F0 /* [CP] Check Pods Manifest.lock */,
+				173C448AF5C94509AE158F85 /* Start Packager */,
+				4C2807CB986444C795AA52A6 /* [Expo] Configure project */,
+				04914316C1CD4E8EA6BF33A5 /* Sources */,
+				8129C1CE326A4A83A613F864 /* Frameworks */,
+				96C09BD62DC1422AAD77C7DB /* Resources */,
+				DB404B78A8AA4BEA83688132 /* Bundle React Native code and images */,
+				5F57314C9792EC3BE5BCF082 /* [CP] Copy Pods Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = ClipRackShareExtension;
+			productName = ClipRackShareExtension;
+			productReference = 3C719E1B17334C3CAFD60F3D /* ClipRackShareExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
 		};
 /* End PBXNativeTarget section */
 
@@ -166,6 +270,11 @@
 				LastUpgradeCheck = 1130;
 				TargetAttributes = {
 					13B07F861A680F5B00A75B9A = {
+						LastSwiftMigration = 1250;
+						DevelopmentTeam = "92MPU3L8PL";
+						ProvisioningStyle = Automatic;
+					};
+					B5EA23197EB342D28EBA3884 = {
 						LastSwiftMigration = 1250;
 						DevelopmentTeam = "92MPU3L8PL";
 						ProvisioningStyle = Automatic;
@@ -186,6 +295,7 @@
 			projectRoot = "";
 			targets = (
 				13B07F861A680F5B00A75B9A /* ClipRack */,
+				B5EA23197EB342D28EBA3884 /* ClipRackShareExtension */,
 			);
 		};
 /* End PBXProject section */
@@ -198,7 +308,14 @@
 				BB2F792D24A3F905000567C9 /* Expo.plist in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 				3E461D99554A48A4959DE609 /* SplashScreen.storyboard in Resources */,
-				D0D62C84E0C173774DF0D9AB /* PrivacyInfo.xcprivacy in Resources */,
+				4B78C474D61FFD522EC8EF56 /* PrivacyInfo.xcprivacy in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		96C09BD62DC1422AAD77C7DB /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -220,24 +337,6 @@
 			shellPath = /bin/sh;
 			shellScript = "if [[ -f \"$PODS_ROOT/../.xcode.env\" ]]; then\n  source \"$PODS_ROOT/../.xcode.env\"\nfi\nif [[ -f \"$PODS_ROOT/../.xcode.env.local\" ]]; then\n  source \"$PODS_ROOT/../.xcode.env.local\"\nfi\n\n# The project root by default is one level up from the ios directory\nexport PROJECT_ROOT=\"$PROJECT_DIR\"/..\n\nif [[ \"$CONFIGURATION\" = *Debug* ]]; then\n  export SKIP_BUNDLING=1\nfi\nif [[ -z \"$ENTRY_FILE\" ]]; then\n  # Set the entry JS file using the bundler's entry resolution.\n  export ENTRY_FILE=\"$(\"$NODE_BINARY\" -e \"require('expo/scripts/resolveAppEntry')\" \"$PROJECT_ROOT\" ios absolute | tail -n 1)\"\nfi\n\nif [[ -z \"$CLI_PATH\" ]]; then\n  # Use Expo CLI\n  export CLI_PATH=\"$(\"$NODE_BINARY\" --print \"require.resolve('@expo/cli', { paths: [require.resolve('expo/package.json')] })\")\"\nfi\nif [[ -z \"$BUNDLE_COMMAND\" ]]; then\n  # Default Expo CLI command for bundling\n  export BUNDLE_COMMAND=\"export:embed\"\nfi\n\n# Source .xcode.env.updates if it exists to allow\n# SKIP_BUNDLING to be unset if needed\nif [[ -f \"$PODS_ROOT/../.xcode.env.updates\" ]]; then\n  source \"$PODS_ROOT/../.xcode.env.updates\"\nfi\n# Source local changes to allow overrides\n# if needed\nif [[ -f \"$PODS_ROOT/../.xcode.env.local\" ]]; then\n  source \"$PODS_ROOT/../.xcode.env.local\"\nfi\n\n`\"$NODE_BINARY\" --print \"require('path').dirname(require.resolve('react-native/package.json')) + '/scripts/react-native-xcode.sh'\"`\n\n";
 		};
-		07ECDA4464D015F91CBB214C /* [CP] Embed Pods Frameworks */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-ClipRack/Pods-ClipRack-frameworks.sh",
-				"${PODS_XCFRAMEWORKS_BUILD_DIR}/hermes-engine/Pre-built/hermes.framework/hermes",
-			);
-			name = "[CP] Embed Pods Frameworks";
-			outputPaths = (
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/hermes.framework",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-ClipRack/Pods-ClipRack-frameworks.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
 		08A4A3CD28434E44B6B9DE2E /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -258,6 +357,117 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		173C448AF5C94509AE158F85 /* Start Packager */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Start Packager";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "export RCT_METRO_PORT=\"${RCT_METRO_PORT:=8081}\"\necho \"export RCT_METRO_PORT=${RCT_METRO_PORT}\" > \"${SRCROOT}/../node_modules/react-native/scripts/.packager.env\"\nif [ -z \"${RCT_NO_LAUNCH_PACKAGER+xxx}\" ] ; then\n  if nc -w 5 -z localhost ${RCT_METRO_PORT} ; then\n    if ! curl -s \"http://localhost:${RCT_METRO_PORT}/status\" | grep -q \"packager-status:running\" ; then\n      echo \"Port ${RCT_METRO_PORT} already in use, packager is either not running or not running correctly\"\n      exit 2\n    fi\n  else\n    open \"$SRCROOT/../node_modules/react-native/scripts/launchPackager.command\" || echo \"Can't start packager automatically\"\n  fi\nfi\n";
+		};
+		3740A587DE25F4AD3426E84D /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-ClipRack/Pods-ClipRack-frameworks.sh",
+				"${PODS_XCFRAMEWORKS_BUILD_DIR}/hermes-engine/Pre-built/hermes.framework/hermes",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputPaths = (
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/hermes.framework",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-ClipRack/Pods-ClipRack-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		4031F123C620D289CBC9E1F0 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-ClipRackShareExtension-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		4C2807CB986444C795AA52A6 /* [Expo] Configure project */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "[Expo] Configure project";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# This script configures Expo modules and generates the modules provider file.\nbash -l -c \"./Pods/Target\\ Support\\ Files/Pods-ClipRackShareExtension/expo-configure-project.sh\"\n";
+		};
+		5F57314C9792EC3BE5BCF082 /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-ClipRackShareExtension/Pods-ClipRackShareExtension-resources.sh",
+				"${PODS_CONFIGURATION_BUILD_DIR}/EXConstants/EXConstants.bundle",
+				"${PODS_CONFIGURATION_BUILD_DIR}/EXConstants/ExpoConstants_privacy.bundle",
+				"${PODS_CONFIGURATION_BUILD_DIR}/ExpoFileSystem/ExpoFileSystem_privacy.bundle",
+				"${PODS_CONFIGURATION_BUILD_DIR}/ExpoSystemUI/ExpoSystemUI_privacy.bundle",
+				"${PODS_CONFIGURATION_BUILD_DIR}/RCT-Folly/RCT-Folly_privacy.bundle",
+				"${PODS_CONFIGURATION_BUILD_DIR}/RNCAsyncStorage/RNCAsyncStorage_resources.bundle",
+				"${PODS_CONFIGURATION_BUILD_DIR}/React-Core/React-Core_privacy.bundle",
+				"${PODS_CONFIGURATION_BUILD_DIR}/React-cxxreact/React-cxxreact_privacy.bundle",
+				"${PODS_CONFIGURATION_BUILD_DIR}/SDWebImage/SDWebImage.bundle",
+				"${PODS_CONFIGURATION_BUILD_DIR}/boost/boost_privacy.bundle",
+				"${PODS_CONFIGURATION_BUILD_DIR}/glog/glog_privacy.bundle",
+			);
+			name = "[CP] Copy Pods Resources";
+			outputPaths = (
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/EXConstants.bundle",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/ExpoConstants_privacy.bundle",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/ExpoFileSystem_privacy.bundle",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/ExpoSystemUI_privacy.bundle",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/RCT-Folly_privacy.bundle",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/RNCAsyncStorage_resources.bundle",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/React-Core_privacy.bundle",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/React-cxxreact_privacy.bundle",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/SDWebImage.bundle",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/boost_privacy.bundle",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/glog_privacy.bundle",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-ClipRackShareExtension/Pods-ClipRackShareExtension-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		800E24972A6A228C8D4807E9 /* [CP] Copy Pods Resources */ = {
@@ -298,7 +508,7 @@
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-ClipRack/Pods-ClipRack-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		B2C1E9650C1BB7ADD6D37E9F /* [Expo] Configure project */ = {
+		8AD9E0DF399FF4BB631D46F9 /* [Expo] Configure project */ = {
 			isa = PBXShellScriptBuildPhase;
 			alwaysOutOfDate = 1;
 			buildActionMask = 2147483647;
@@ -317,24 +527,55 @@
 			shellPath = /bin/sh;
 			shellScript = "# This script configures Expo modules and generates the modules provider file.\nbash -l -c \"./Pods/Target\\ Support\\ Files/Pods-ClipRack/expo-configure-project.sh\"\n";
 		};
+		DB404B78A8AA4BEA83688132 /* Bundle React Native code and images */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Bundle React Native code and images";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "set -e\n  NODE_BINARY=${NODE_BINARY:-node}\n  \n  # Source environment files\n  if [[ -f \"$PODS_ROOT/../.xcode.env\" ]]; then\n    source \"$PODS_ROOT/../.xcode.env\"\n  fi\n  if [[ -f \"$PODS_ROOT/../.xcode.env.local\" ]]; then\n    source \"$PODS_ROOT/../.xcode.env.local\"\n  fi\n  \n  # Set project root\n  export PROJECT_ROOT=\"$PROJECT_DIR\"/..\n  \n  # Set entry file\n  export ENTRY_FILE=\"$PROJECT_ROOT/index.share.js\"\n  \n  # Set up Expo CLI\n  if [[ -z \"$CLI_PATH\" ]]; then\n    export CLI_PATH=\"$(\"$NODE_BINARY\" --print \"require.resolve('@expo/cli', { paths: [require.resolve('expo/package.json')] })\")\"\n  fi\n  \n  if [[ -z \"$BUNDLE_COMMAND\" ]]; then\n    export BUNDLE_COMMAND=\"export:embed\"\n  fi\n  \n  REACT_NATIVE_SCRIPTS_PATH=$(\"$NODE_BINARY\" --print \"require('path').dirname(require.resolve('react-native/package.json')) + '/scripts'\")\n  WITH_ENVIRONMENT=\"$REACT_NATIVE_SCRIPTS_PATH/xcode/with-environment.sh\"\n  REACT_NATIVE_XCODE=\"$REACT_NATIVE_SCRIPTS_PATH/react-native-xcode.sh\"\n  \n  /bin/sh -c \"$WITH_ENVIRONMENT $REACT_NATIVE_XCODE\"";
+		};
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		04914316C1CD4E8EA6BF33A5 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				78FB35E439F444D292E04C3A /* ShareExtensionViewController.swift in Sources */,
+				CEFA59FF0DA959231D29C265 /* ExpoModulesProvider.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		13B07F871A680F5B00A75B9A /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 				F11748422D0307B40044C1D9 /* AppDelegate.swift in Sources */,
-				161E66E22D90485DC99106A6 /* ExpoModulesProvider.swift in Sources */,
+				6DC53D1805FDF844F67DB4C9 /* ExpoModulesProvider.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
+/* Begin PBXTargetDependency section */
+		F8A995FD74404D51A3CA2CA2 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = B5EA23197EB342D28EBA3884 /* ClipRackShareExtension */;
+			targetProxy = 2C0122078695480A9DF0305E /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
 /* Begin XCBuildConfiguration section */
 		13B07F941A680F5B00A75B9A /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = DEE108D699A7515CB30D3756 /* Pods-ClipRack.debug.xcconfig */;
+			baseConfigurationReference = 2B051B9D1B5BDABDB8257B5E /* Pods-ClipRack.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
@@ -373,7 +614,7 @@
 		};
 		13B07F951A680F5B00A75B9A /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 34BDBFAF2F6A70F9FD458BFE /* Pods-ClipRack.release.xcconfig */;
+			baseConfigurationReference = F4A77ABC0601FA71DF39D46D /* Pods-ClipRack.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
@@ -528,6 +769,63 @@
 			};
 			name = Release;
 		};
+		9D0B853A30BC4DEEAA51AA3B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 04B7062AE77040D1ACE5C1F1 /* Pods-ClipRackShareExtension.debug.xcconfig */;
+			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = ClipRackShareExtension/ClipRackShareExtension.entitlements;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_ON_DEMAND_RESOURCES = NO;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = ClipRackShareExtension/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.1;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0.0;
+				OTHER_SWIFT_FLAGS = "$(inherited) -D EXPO_CONFIGURATION_DEBUG";
+				PRODUCT_BUNDLE_IDENTIFIER = com.alexdonnelly.ClipRackApp.ShareExtension;
+				PRODUCT_NAME = ClipRackShareExtension;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_VERSION = 5.0;
+				VERSIONING_SYSTEM = "apple-generic";
+				DEVELOPMENT_TEAM = "92MPU3L8PL";
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+			};
+			name = Debug;
+		};
+		A20623DC69924FDA96472857 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 3BDD5E794527CD95E295F10B /* Pods-ClipRackShareExtension.release.xcconfig */;
+			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = ClipRackShareExtension/ClipRackShareExtension.entitlements;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_ON_DEMAND_RESOURCES = NO;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = ClipRackShareExtension/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.1;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0.0;
+				OTHER_SWIFT_FLAGS = "$(inherited) -D EXPO_CONFIGURATION_RELEASE";
+				PRODUCT_BUNDLE_IDENTIFIER = com.alexdonnelly.ClipRackApp.ShareExtension;
+				PRODUCT_NAME = ClipRackShareExtension;
+				SWIFT_VERSION = 5.0;
+				VERSIONING_SYSTEM = "apple-generic";
+				DEVELOPMENT_TEAM = "92MPU3L8PL";
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -536,6 +834,15 @@
 			buildConfigurations = (
 				13B07F941A680F5B00A75B9A /* Debug */,
 				13B07F951A680F5B00A75B9A /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		5DF79EADF4BA4BFDADEE433F /* Build configuration list for PBXNativeTarget "ClipRackShareExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				9D0B853A30BC4DEEAA51AA3B /* Debug */,
+				A20623DC69924FDA96472857 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

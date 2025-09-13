@@ -10,7 +10,10 @@
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.alexdonnelly.ClipRackApp"
+      "bundleIdentifier": "com.alexdonnelly.ClipRackApp",
+      "entitlements": {
+        "com.apple.security.application-groups": ["group.com.alexdonnelly.ClipRackApp"]
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -36,7 +39,36 @@
           "backgroundColor": "#ffffff"
         }
       ],
-      "expo-secure-store"
+      "expo-secure-store",
+      [
+        "expo-share-extension",
+        {
+          "activationRules": [
+            {
+              "type": "url",
+              "max": 1
+            },
+            {
+              "type": "text"
+            },
+            {
+              "type": "image",
+              "max": 2
+            },
+            {
+              "type": "video",
+              "max": 1
+            }
+          ],
+          "height": 400,
+          "backgroundColor": {
+            "red": 255,
+            "green": 255,
+            "blue": 255,
+            "alpha": 0.95
+          }
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true

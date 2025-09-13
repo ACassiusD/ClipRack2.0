@@ -1,7 +1,8 @@
 // Learn more https://docs.expo.io/guides/customizing-metro
 const { getDefaultConfig } = require("expo/metro-config");
+const { withShareExtension } = require("expo-share-extension/metro");
 
-module.exports = getDefaultConfig(__dirname, {
+module.exports = withShareExtension(getDefaultConfig(__dirname), {
   // [Web-only]: Enables CSS support in Metro.
   isCSSEnabled: true,
 });
