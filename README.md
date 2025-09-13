@@ -126,6 +126,15 @@ npx expo prebuild --no-install --clean
 2. **Don't hard reset** unless you're prepared to reapply the xcode patch
 3. **Commit the fixed xcode package** if you want it to survive resets
 
+## 📋 TODO
+
+### 🧹 Cleanup Tasks
+- [ ] **Remove `react-native-shared-group-preferences`** - This module was tried but proved unreliable for App Groups sharing. Should be completely removed from:
+  - `package.json` dependencies
+  - `lib/sharedStorage.ts` (if any references remain)
+  - Any other files that import it
+  - Clean up any unused code related to this module
+
 ---
 
 **Remember**: This project requires careful attention to package management and proper Xcode signing configuration for the share extension to work!
