@@ -8,9 +8,6 @@
     "scheme": "cliprack",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
-    "linking": {
-      "nativeIntentRedirect": "./app/+native-intent.ts"
-    },
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.alexdonnelly.ClipRackApp"
@@ -29,26 +26,6 @@
       "favicon": "./assets/images/favicon.png"
     },
     "plugins": [
-      [
-        "expo-share-intent",
-        {
-          "iosActivationRules": {
-            "NSExtensionActivationSupportsWebURLWithMaxCount": 1,
-            "NSExtensionActivationSupportsWebPageWithMaxCount": 1,
-            "NSExtensionActivationSupportsImageWithMaxCount": 1,
-            "NSExtensionActivationSupportsMovieWithMaxCount": 1,
-            "NSExtensionActivationSupportsText": true
-          },
-          "androidIntentFilters": [
-            "text/*",
-            "image/*",
-            "video/*"
-          ],
-          "iosShareExtension": {
-            "bundleIdentifier": "com.alexdonnelly.ClipRackApp.share-extension"
-          }
-        }
-      ],
       "expo-router",
       [
         "expo-splash-screen",

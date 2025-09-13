@@ -1,0 +1,4 @@
+---
+alwaysApply: true
+---
+Always use nvm use 20 && npx expo run:ios --device to run the app in developer mode.

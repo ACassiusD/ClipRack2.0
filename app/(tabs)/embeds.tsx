@@ -3,14 +3,12 @@
  * 
  * Features:
  * - Grid layout of video clips (YouTube, TikTok, Instagram)
- * - Share intent integration for adding new clips
  * - Thumbnail previews and embed playback
  * - Persistent storage with AsyncStorage
  * - Delete functionality for individual clips
  */
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Haptics from 'expo-haptics';
-import { useShareIntentContext } from 'expo-share-intent';
 import { StatusBar } from 'expo-status-bar';
 import React from 'react';
 import { Alert, FlatList, Image, Modal, RefreshControl, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
@@ -146,41 +144,6 @@ const getBaseUrl = (type: 'youtube' | 'tiktok' | 'instagram'): string => {
   }
 };
 
-/** Resolves TikTok short URL to full format */
-const resolveTikTokShortUrl = async (shortUrl: string): Promise<string | null> => {
-  try {
-    console.log('🔄 Resolving TikTok short URL:', shortUrl);
-    
-    // Make a HEAD request to get the redirect URL
-    const response = await fetch(shortUrl, { 
-      method: 'HEAD',
-      redirect: 'manual' // Don't follow redirects automatically
-    });
-    
-    // Check if we got a redirect
-    if (response.status >= 300 && response.status < 400) {
-      const location = response.headers.get('location');
-      if (location) {
-        console.log('✅ Resolved TikTok URL:', location);
-        return location;
-      }
-    }
-    
-    // If no redirect, try a GET request with redirect following
-    const getResponse = await fetch(shortUrl, { redirect: 'follow' });
-    if (getResponse.url !== shortUrl) {
-      console.log('✅ Resolved TikTok URL via GET:', getResponse.url);
-      return getResponse.url;
-    }
-    
-    console.log('❌ Could not resolve TikTok short URL');
-    return null;
-    
-  } catch (error) {
-    console.log('❌ Error resolving TikTok short URL:', error);
-    return null;
-  }
-};
 
 /** Fetches TikTok thumbnail via oEmbed API with fallback URL construction */
 const fetchTikTokThumbnail = async (videoId: string, isShortUrl: boolean = false): Promise<string | null> => {
@@ -239,150 +202,9 @@ const getThumbnailUrl = (embed: EmbedData): string | null => {
   return null;
 };
 
-/** Parses Instagram URLs (posts/reels) and extracts post ID, username, and content type */
-const parseInstagramUrl = (url: string): { postId: string; username?: string; contentType: 'post' | 'reel' } | null => {
-  // Instagram URL patterns:
-  // https://www.instagram.com/p/POST_ID/ (posts)
-  // https://www.instagram.com/reel/REEL_ID/ (reels)
-  // https://www.instagram.com/username/p/POST_ID/
-  // https://www.instagram.com/username/reel/REEL_ID/
-  const instagramRegex = /(?:https?:\/\/(?:www\.)?instagram\.com(?:\/[^\/]+)?\/(p|reel)\/([^\/\?]+))/;
-  const match = url.match(instagramRegex);
-  
-  if (match) {
-    const contentType = match[1] as 'post' | 'reel';
-    const postId = match[2];
-    
-    // Extract username if present
-    const usernameMatch = url.match(/instagram\.com\/([^\/]+)\/(p|reel)\//);
-    const username = usernameMatch ? usernameMatch[1] : undefined;
-    
-    return { postId, username, contentType };
-  }
-  
-  return null;
-};
 
-/** Parses YouTube URLs and extracts video ID */
-const parseYouTubeUrl = (url: string): { videoId: string } | null => {
-  // YouTube URL patterns:
-  // https://www.youtube.com/watch?v=VIDEO_ID
-  // https://youtu.be/VIDEO_ID
-  // https://youtube.com/shorts/VIDEO_ID (YouTube Shorts)
-  // https://www.youtube.com/shorts/VIDEO_ID (YouTube Shorts)
-  const youtubeRegex = /(?:https?:\/\/(?:www\.)?youtube\.com\/(?:watch\?v=|shorts\/)|https?:\/\/youtu\.be\/)([^&\n?#]+)/;
-  const match = url.match(youtubeRegex);
-  
-  if (match) {
-    return { videoId: match[1] };
-  }
-  
-  return null;
-};
 
-/** Parses TikTok URLs and extracts video ID and username */
-const parseTikTokUrl = (url: string): { postId: string; username?: string; isShortUrl?: boolean } | null => {
-  // TikTok URL patterns:
-  // https://www.tiktok.com/@username/video/POST_ID (full format)
-  // https://tiktok.com/@username/video/POST_ID (full format)
-  // https://vt.tiktok.com/SHORT_ID (shortened format)
-  const fullTiktokRegex = /(?:https?:\/\/(?:www\.)?tiktok\.com\/@([^\/]+)\/video\/([^\/\?]+))/;
-  const shortTiktokRegex = /(?:https?:\/\/vt\.tiktok\.com\/([^\/\?]+))/;
-  
-  const fullMatch = url.match(fullTiktokRegex);
-  if (fullMatch) {
-    const username = fullMatch[1];
-    const postId = fullMatch[2];
-    return { postId, username };
-  }
-  
-  const shortMatch = url.match(shortTiktokRegex);
-  if (shortMatch) {
-    const shortId = shortMatch[1];
-    return { postId: shortId, isShortUrl: true };
-  }
-  
-  return null;
-};
 
-/** Creates EmbedData object from shared URL, converts reel URLs to post format */
-const createEmbedFromUrl = async (url: string): Promise<EmbedData | null> => {
-  // Try Instagram first
-  const instagramData = parseInstagramUrl(url);
-  if (instagramData) {
-    const contentType = instagramData.contentType === 'reel' ? 'Reel' : 'Post';
-    
-    // Convert reel URLs to post format for consistency
-    const cleanUrl = instagramData.contentType === 'reel' 
-      ? `https://www.instagram.com/p/${instagramData.postId}/`
-      : url;
-    
-    return {
-      id: `instagram-${instagramData.postId}-${Date.now()}`,
-      type: 'instagram',
-      title: `Instagram ${contentType}`,
-      subtitle: instagramData.username ? `@${instagramData.username}` : instagramData.postId,
-      url: cleanUrl, // Use the cleaned URL
-      postId: instagramData.postId,
-      username: instagramData.username,
-      createdAt: Date.now()
-    };
-  }
-  
-  // Try YouTube
-  const youtubeData = parseYouTubeUrl(url);
-  if (youtubeData) {
-    const isShorts = url.includes('/shorts/');
-    return {
-      id: `youtube-${youtubeData.videoId}-${Date.now()}`,
-      type: 'youtube',
-      title: isShorts ? 'YouTube Short' : 'YouTube Video',
-      subtitle: `Open ${youtubeData.videoId}`,
-      url: url,
-      videoId: youtubeData.videoId,
-      createdAt: Date.now()
-    };
-  }
-  
-  // Try TikTok
-  const tiktokData = parseTikTokUrl(url);
-  if (tiktokData) {
-    let finalUrl = url;
-    let finalPostId = tiktokData.postId;
-    let finalUsername = tiktokData.username;
-    let isShortUrl = tiktokData.isShortUrl;
-    
-    // If it's a short URL, try to resolve it
-    if (tiktokData.isShortUrl) {
-      const resolvedUrl = await resolveTikTokShortUrl(url);
-      if (resolvedUrl) {
-        // Parse the resolved URL to get the full format data
-        const resolvedData = parseTikTokUrl(resolvedUrl);
-        if (resolvedData && !resolvedData.isShortUrl) {
-          finalUrl = resolvedUrl;
-          finalPostId = resolvedData.postId;
-          finalUsername = resolvedData.username;
-          isShortUrl = false;
-          console.log('✅ Successfully resolved TikTok short URL to full format');
-        }
-      }
-    }
-    
-    return {
-      id: `tiktok-${finalPostId}-${Date.now()}`,
-      type: 'tiktok',
-      title: 'TikTok Video',
-      subtitle: finalUsername ? `@${finalUsername}` : (isShortUrl ? 'Short URL' : finalPostId),
-      url: finalUrl,
-      postId: finalPostId,
-      username: finalUsername,
-      isShortUrl: isShortUrl,
-      createdAt: Date.now()
-    };
-  }
-  
-  return null;
-};
 
 // ============================================================================
 // Storage Functions
@@ -433,7 +255,7 @@ const loadCategories = async (): Promise<Category[]> => {
 // Main Component
 // ============================================================================
 
-/** Main EmbedsScreen component - handles grid display, share intents, and embed playback */
+/** Main EmbedsScreen component - handles grid display and embed playback */
 export default function EmbedsScreen() {
   const [active, setActive] = React.useState<Provider>('menu');
   const [selectedEmbed, setSelectedEmbed] = React.useState<EmbedData | null>(null);
@@ -442,7 +264,6 @@ export default function EmbedsScreen() {
   const [tiktokThumbnails, setTiktokThumbnails] = React.useState<Record<string, string>>({});
   const [loadingThumbnails, setLoadingThumbnails] = React.useState<Set<string>>(new Set());
   const [loadingInstagramEmbeds, setLoadingInstagramEmbeds] = React.useState<Set<string>>(new Set());
-  const [showShareBanner, setShowShareBanner] = React.useState(false);
   const [showFilterPage, setShowFilterPage] = React.useState(false);
   const [selectedSites, setSelectedSites] = React.useState<Set<string>>(new Set(['youtube', 'tiktok', 'instagram']));
   const [refreshing, setRefreshing] = React.useState(false);
@@ -458,7 +279,6 @@ export default function EmbedsScreen() {
   // Ref to track if thumbnails have been loaded to prevent Strict Mode double execution
   const thumbnailsLoadedRef = React.useRef(false);
   
-  const { hasShareIntent, shareIntent, resetShareIntent } = useShareIntentContext();
 
   // Load saved dynamic embeds and categories on component mount
   React.useEffect(() => {
@@ -623,51 +443,6 @@ export default function EmbedsScreen() {
     }
   }, [fetchThumbnailsForEmbeds]);
 
-  // Process shared content and create embeds
-  React.useEffect(() => {
-    if (hasShareIntent && shareIntent.webUrl) {
-      console.log('🔄 Processing shared URL:', shareIntent.webUrl);
-      
-      const processShareIntent = async () => {
-        const embed = await createEmbedFromUrl(shareIntent.webUrl!);
-        console.log('🎬 Created embed object:', embed);
-        
-        if (embed) {
-          // Check if this embed already exists (by URL, not ID since ID includes timestamp)
-          const exists = dynamicEmbeds.some(e => e.url === embed.url);
-          console.log('🔍 Embed already exists:', exists);
-          
-          if (!exists) {
-            const newEmbeds = [...dynamicEmbeds, embed];
-            setDynamicEmbeds(newEmbeds);
-            
-            // Save to AsyncStorage
-            saveDynamicEmbeds(newEmbeds);
-            console.log('💾 Saved embed to storage');
-            
-            // Fetch thumbnail only for the new clip (incremental loading)
-            fetchThumbnailsForEmbeds([embed]);
-            
-            // Show the banner for 8 seconds
-            setShowShareBanner(true);
-            setTimeout(() => {
-              setShowShareBanner(false);
-            }, 8000);
-            
-            // Don't automatically show the clip - just stay on the clips list
-            // User can tap on the new clip card to view it
-            console.log('💾 Clip created and saved - staying on clips list');
-          } else {
-            console.log('🔍 Clip already exists - staying on clips list');
-          }
-        } else {
-          console.log('❌ Failed to create embed from URL');
-        }
-      };
-      
-      processShareIntent();
-    }
-  }, [hasShareIntent, shareIntent.webUrl, dynamicEmbeds, fetchThumbnailsForEmbeds]);
 
   // Combine starter embeds with dynamic embeds, with dynamic embeds always on top, then apply filters
   const allEmbeds = [...dynamicEmbeds, ...STARTER_EMBEDS]
@@ -929,36 +704,6 @@ export default function EmbedsScreen() {
         </View>
       )}
       
-      {/* Share Intent Status */}
-      {showShareBanner && shareIntent.webUrl && (() => {
-        // Determine platform from the shared URL
-        let platform = 'Unknown';
-        if (shareIntent.webUrl.includes('instagram.com')) {
-          platform = 'Instagram';
-        } else if (shareIntent.webUrl.includes('youtube.com') || shareIntent.webUrl.includes('youtu.be')) {
-          platform = 'YouTube';
-        } else if (shareIntent.webUrl.includes('tiktok.com') || shareIntent.webUrl.includes('vt.tiktok.com')) {
-          platform = 'TikTok';
-        }
-        
-        return (
-          <View style={styles.shareStatus}>
-            <Text style={styles.shareStatusText}>
-              🎬 New clip added from {platform}
-            </Text>
-            <TouchableOpacity 
-              style={styles.clearButton}
-              onPress={() => {
-                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                setShowShareBanner(false);
-                resetShareIntent();
-              }}
-            >
-              <Text style={styles.clearButtonText}>Clear</Text>
-            </TouchableOpacity>
-          </View>
-        );
-      })()}
       
       {isLoading ? (
         <Text style={styles.loadingText}>Loading clips...</Text>
