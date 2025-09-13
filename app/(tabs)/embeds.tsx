@@ -12,8 +12,10 @@ import * as Haptics from 'expo-haptics';
 import { StatusBar } from 'expo-status-bar';
 import React from 'react';
 import { Alert, FlatList, Image, Modal, RefreshControl, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { MMKV } from 'react-native-mmkv';
 import { WebView } from 'react-native-webview';
 
+import { useLocalSearchParams } from 'expo-router';
 import { IconSymbol } from '../../components/ui/IconSymbol';
 import { useSharedContent } from '../../hooks/useSharedContent';
 import { CATEGORY_COLORS, DEFAULT_CATEGORIES, STARTER_EMBEDS, STORAGE_KEYS } from '../../src/embeds/constants';
@@ -276,26 +278,104 @@ export default function EmbedsScreen() {
   const [selectedCategories, setSelectedCategories] = React.useState<Set<string>>(new Set());
   const [newCategoryName, setNewCategoryName] = React.useState('');
   const [filterByCategory, setFilterByCategory] = React.useState<string | null>(null);
+  const [useMMKV, setUseMMKV] = React.useState(true); // Toggle between MMKV and AsyncStorage
   
   // Ref to track if thumbnails have been loaded to prevent Strict Mode double execution
   const thumbnailsLoadedRef = React.useRef(false);
   
   // Shared content hook
   const { sharedContent } = useSharedContent();
+  
+  // Get shared data from URL parameters (when opened from share extension)
+  const { sharedData } = useLocalSearchParams<{ sharedData?: string }>();
+
+  // Function to load embeds from selected storage source
+  const loadEmbedsFromStorage = async (storageType: 'mmkv' | 'async'): Promise<EmbedData[]> => {
+    try {
+      if (storageType === 'mmkv') {
+        const mmkvStorage = new MMKV({ id: 'cliprack-shared-storage' });
+        const embedsData = mmkvStorage.getString('cliprack_embeds');
+        console.log('🔍 Loading embeds from MMKV:', embedsData ? 'EXISTS' : 'NULL');
+        return embedsData ? JSON.parse(embedsData) : [];
+      } else {
+        const embedsData = await AsyncStorage.getItem('cliprack_embeds');
+        console.log('🔍 Loading embeds from AsyncStorage:', embedsData ? 'EXISTS' : 'NULL');
+        return embedsData ? JSON.parse(embedsData) : [];
+      }
+    } catch (error) {
+      console.error(`❌ Error loading embeds from ${storageType}:`, error);
+      return [];
+    }
+  };
+
+  // Function to load categories from selected storage source
+  const loadCategoriesFromStorage = async (storageType: 'mmkv' | 'async'): Promise<Category[]> => {
+    try {
+      if (storageType === 'mmkv') {
+        const mmkvStorage = new MMKV({ id: 'cliprack-shared-storage' });
+        const categoriesData = mmkvStorage.getString('cliprack_categories');
+        console.log('🔍 Loading categories from MMKV:', categoriesData ? 'EXISTS' : 'NULL');
+        return categoriesData ? JSON.parse(categoriesData) : [];
+      } else {
+        const categoriesData = await AsyncStorage.getItem('cliprack_categories');
+        console.log('🔍 Loading categories from AsyncStorage:', categoriesData ? 'EXISTS' : 'NULL');
+        return categoriesData ? JSON.parse(categoriesData) : [];
+      }
+    } catch (error) {
+      console.error(`❌ Error loading categories from ${storageType}:`, error);
+      return [];
+    }
+  };
+
+  // Debug function to check both MMKV and AsyncStorage
+  const debugStorage = async () => {
+    try {
+      const mmkvStorage = new MMKV({ id: 'cliprack-shared-storage' });
+      
+      const mmkvEmbeds = mmkvStorage.getString('cliprack_embeds');
+      const mmkvCategories = mmkvStorage.getString('cliprack_categories');
+      const mmkvSharedContent = mmkvStorage.getString('shared_content');
+      
+      const asyncEmbeds = await AsyncStorage.getItem('cliprack_embeds');
+      const asyncCategories = await AsyncStorage.getItem('cliprack_categories');
+      const asyncSharedContent = await AsyncStorage.getItem('shared_content');
+      
+      Alert.alert(
+        'Storage Debug',
+        `MMKV:\n• cliprack_embeds: ${mmkvEmbeds ? 'EXISTS' : 'NULL'}\n• cliprack_categories: ${mmkvCategories ? 'EXISTS' : 'NULL'}\n• shared_content: ${mmkvSharedContent ? 'EXISTS' : 'NULL'}\n\nAsyncStorage:\n• cliprack_embeds: ${asyncEmbeds ? 'EXISTS' : 'NULL'}\n• cliprack_categories: ${asyncCategories ? 'EXISTS' : 'NULL'}\n• shared_content: ${asyncSharedContent ? 'EXISTS' : 'NULL'}`,
+        [{ text: 'OK' }]
+      );
+      
+      console.log('🔍 MMKV Debug:', {
+        cliprack_embeds: mmkvEmbeds,
+        cliprack_categories: mmkvCategories,
+        shared_content: mmkvSharedContent
+      });
+      
+      console.log('🔍 AsyncStorage Debug:', {
+        cliprack_embeds: asyncEmbeds,
+        cliprack_categories: asyncCategories,
+        shared_content: asyncSharedContent
+      });
+    } catch (error) {
+      console.error('❌ Debug storage error:', error);
+      Alert.alert('Debug Error', `Error: ${error}`);
+    }
+  };
 
   // Load saved dynamic embeds and categories on component mount
   React.useEffect(() => {
     const loadSavedData = async () => {
       const [savedEmbeds, savedCategories] = await Promise.all([
-        loadDynamicEmbeds(),
-        loadCategories()
+        loadEmbedsFromStorage(useMMKV ? 'mmkv' : 'async'),
+        loadCategoriesFromStorage(useMMKV ? 'mmkv' : 'async')
       ]);
       setDynamicEmbeds(savedEmbeds);
       setCategories(savedCategories);
       setIsLoading(false);
     };
     loadSavedData();
-  }, []);
+  }, [useMMKV]);
 
   // Fetch thumbnails for specific embeds only (TikTok only)
   const fetchThumbnailsForEmbeds = React.useCallback(async (embeds: EmbedData[]) => {
@@ -675,19 +755,52 @@ export default function EmbedsScreen() {
   const renderMenu = () => (
     <View style={styles.menuContainer}>
       <View style={styles.titleRow}>
-        <View style={styles.titleSpacer} />
-        <Text style={styles.title}>Saved Clips</Text>
         <TouchableOpacity 
-          style={[styles.filterButton, (filterByCategory || selectedSites.size < 3) && styles.filterButtonActive]}
-          onPress={() => {
-            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-            setShowFilterPage(true);
-          }}
+          style={styles.debugButton}
+          onPress={debugStorage}
         >
-          <IconSymbol name="line.3.horizontal.decrease" size={20} color="#007bff" />
+          <IconSymbol name="ladybug" size={20} color="#ff6b6b" />
         </TouchableOpacity>
+        <Text style={styles.title}>Saved Clips</Text>
+        <View style={styles.rightButtons}>
+          <TouchableOpacity 
+            style={[styles.storageToggleButton, useMMKV && styles.storageToggleButtonActive]}
+            onPress={() => {
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              setUseMMKV(true);
+            }}
+          >
+            <Text style={[styles.storageToggleText, useMMKV && styles.storageToggleTextActive]}>MMKV</Text>
+          </TouchableOpacity>
+          <TouchableOpacity 
+            style={[styles.storageToggleButton, !useMMKV && styles.storageToggleButtonActive]}
+            onPress={() => {
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              setUseMMKV(false);
+            }}
+          >
+            <Text style={[styles.storageToggleText, !useMMKV && styles.storageToggleTextActive]}>Async</Text>
+          </TouchableOpacity>
+          <TouchableOpacity 
+            style={[styles.filterButton, (filterByCategory || selectedSites.size < 3) && styles.filterButtonActive]}
+            onPress={() => {
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              setShowFilterPage(true);
+            }}
+          >
+            <IconSymbol name="line.3.horizontal.decrease" size={20} color="#007bff" />
+          </TouchableOpacity>
+        </View>
       </View>
       
+      {/* Storage Source Indicator */}
+      <View style={styles.storageIndicator}>
+        <View style={[styles.storageDot, { backgroundColor: useMMKV ? '#28a745' : '#ffc107' }]} />
+        <Text style={styles.storageIndicatorText}>
+          Loading from {useMMKV ? 'MMKV' : 'AsyncStorage'}
+        </Text>
+      </View>
+
       {/* Active Filter Indicator */}
       {filterByCategory && (
         <View style={styles.activeFilterIndicator}>
@@ -1168,28 +1281,107 @@ export default function EmbedsScreen() {
     }
   };
 
-  // Process shared content from share extension
+  // Process shared data from share extension (via URL parameters)
   React.useEffect(() => {
-    const processSharedContent = async () => {
-      if (sharedContent.length > 0) {
-        for (const content of sharedContent) {
+    const processSharedData = async () => {
+      if (sharedData) {
+        try {
+          console.log('🔍 Main App: Processing shared data from URL:', sharedData);
+          const content = JSON.parse(decodeURIComponent(sharedData));
+          console.log('🔍 Main App: Parsed shared data:', content);
+          
           if (content.url) {
+            console.log('🔍 Main App: Creating embed from shared URL:', content.url);
             // Parse URL and create embed
             const embed = await createEmbedFromUrl(content.url);
+            console.log('🔍 Main App: Created embed:', embed);
             if (embed) {
               // Check if this embed already exists
               const exists = dynamicEmbeds.some(e => e.url === embed.url);
+              console.log('🔍 Main App: Embed exists?', exists);
               if (!exists) {
-                const newEmbeds = [...dynamicEmbeds, embed];
+                // Add the category from shared content to the embed
+                const embedWithCategory = {
+                  ...embed,
+                  categories: content.category ? [content.category] : []
+                };
+                console.log('🔍 Main App: Embed with category:', embedWithCategory);
+                const newEmbeds = [...dynamicEmbeds, embedWithCategory];
                 setDynamicEmbeds(newEmbeds);
                 await saveDynamicEmbeds(newEmbeds);
-                console.log('💾 Saved shared content as embed');
+                console.log('💾 Main App: Saved shared data as embed with category:', content.category);
+                
+                // Show success message
+                Alert.alert(
+                  'Saved!', 
+                  `Content saved to ${content.category} category`,
+                  [{ text: 'OK' }]
+                );
+              } else {
+                console.log('⚠️ Main App: Embed already exists, skipping');
+                Alert.alert('Already Saved', 'This content has already been saved to your clips.');
               }
+            } else {
+              console.log('❌ Main App: Failed to create embed from shared URL');
+              Alert.alert('Error', 'Could not process the shared content. Please try again.');
             }
+          } else {
+            console.log('⚠️ Main App: No URL in shared data');
+            Alert.alert('Error', 'No valid URL found in the shared content.');
+          }
+        } catch (error) {
+          console.error('❌ Main App: Error processing shared data:', error);
+          Alert.alert('Error', 'Failed to process shared content. Please try again.');
+        }
+      }
+    };
+    
+    processSharedData();
+  }, [sharedData, dynamicEmbeds]);
+
+  // Process shared content from share extension (legacy - keeping for now)
+  React.useEffect(() => {
+    const processSharedContent = async () => {
+      console.log('🔍 Main App: Processing shared content, count:', sharedContent.length);
+      console.log('🔍 Main App: Shared content:', sharedContent);
+      
+      if (sharedContent.length > 0) {
+        for (const content of sharedContent) {
+          console.log('🔍 Main App: Processing content:', content);
+          if (content.url) {
+            console.log('🔍 Main App: Creating embed from URL:', content.url);
+            // Parse URL and create embed
+            const embed = await createEmbedFromUrl(content.url);
+            console.log('🔍 Main App: Created embed:', embed);
+            if (embed) {
+              // Check if this embed already exists
+              const exists = dynamicEmbeds.some(e => e.url === embed.url);
+              console.log('🔍 Main App: Embed exists?', exists);
+              if (!exists) {
+                // Add the category from shared content to the embed
+                const embedWithCategory = {
+                  ...embed,
+                  categories: content.category ? [content.category] : []
+                };
+                console.log('🔍 Main App: Embed with category:', embedWithCategory);
+                const newEmbeds = [...dynamicEmbeds, embedWithCategory];
+                setDynamicEmbeds(newEmbeds);
+                await saveDynamicEmbeds(newEmbeds);
+                console.log('💾 Main App: Saved shared content as embed with category:', content.category);
+              } else {
+                console.log('⚠️ Main App: Embed already exists, skipping');
+              }
+            } else {
+              console.log('❌ Main App: Failed to create embed from URL');
+            }
+          } else {
+            console.log('⚠️ Main App: No URL in shared content');
           }
         }
         // Clear shared content after processing
         // await clearSharedContent();
+      } else {
+        console.log('ℹ️ Main App: No shared content to process');
       }
     };
     

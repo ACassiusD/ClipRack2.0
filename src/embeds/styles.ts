@@ -38,6 +38,68 @@ export const styles = StyleSheet.create({
   titleSpacer: {
     width: 44, // Same width as filter button to balance the layout
   },
+  debugButton: {
+    backgroundColor: 'rgba(255, 107, 107, 0.15)',
+    borderRadius: 12,
+    width: 44,
+    height: 44,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 107, 107, 0.4)',
+    shadowColor: '#ff6b6b',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  rightButtons: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  storageToggleButton: {
+    backgroundColor: 'rgba(108, 117, 125, 0.15)',
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderWidth: 1,
+    borderColor: 'rgba(108, 117, 125, 0.4)',
+  },
+  storageToggleButtonActive: {
+    backgroundColor: 'rgba(0, 123, 255, 0.15)',
+    borderColor: 'rgba(0, 123, 255, 0.4)',
+  },
+  storageToggleText: {
+    color: '#8E8E93',
+    fontSize: 12,
+    fontWeight: '500',
+  },
+  storageToggleTextActive: {
+    color: '#007bff',
+    fontWeight: '600',
+  },
+  storageIndicator: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.3)',
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    marginBottom: 12,
+    alignSelf: 'flex-start',
+  },
+  storageDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    marginRight: 8,
+  },
+  storageIndicatorText: {
+    color: '#e8e8ea',
+    fontSize: 12,
+    fontWeight: '500',
+  },
   filterButton: {
     backgroundColor: 'rgba(0, 123, 255, 0.15)',
     borderRadius: 12,

@@ -1,8 +1,8 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useEffect, useState } from 'react';
+import { sharedStorage } from '../lib/sharedStorage';
 
 interface SharedContent {
-  folder: string;
+  category: string;
   text?: string;
   url?: string;
   images?: string[];
@@ -16,18 +16,32 @@ export function useSharedContent() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    console.log('🔍 useSharedContent: Hook initialized, loading shared content');
     loadSharedContent();
+    
+    // Check for new shared content every 2 seconds
+    const interval = setInterval(() => {
+      console.log('🔍 useSharedContent: Periodic check for new shared content');
+      loadSharedContent();
+    }, 2000);
+    
+    return () => clearInterval(interval);
   }, []);
 
   const loadSharedContent = async () => {
     try {
-      const data = await AsyncStorage.getItem('shared_content');
+      console.log('🔍 useSharedContent: Loading shared content from shared storage');
+      const data = await sharedStorage.getItem('shared_content');
+      console.log('🔍 useSharedContent: Raw data from shared storage:', data);
       if (data) {
         const content = JSON.parse(data);
+        console.log('🔍 useSharedContent: Parsed content:', content);
         setSharedContent(content);
+      } else {
+        console.log('ℹ️ useSharedContent: No shared content found');
       }
     } catch (error) {
-      console.error('Error loading shared content:', error);
+      console.error('❌ useSharedContent: Error loading shared content:', error);
     } finally {
       setIsLoading(false);
     }
@@ -35,20 +49,20 @@ export function useSharedContent() {
 
   const clearSharedContent = async () => {
     try {
-      await AsyncStorage.removeItem('shared_content');
+      await sharedStorage.removeItem('shared_content');
       setSharedContent([]);
     } catch (error) {
       console.error('Error clearing shared content:', error);
     }
   };
 
-  const addToFolder = async (content: SharedContent) => {
+  const addToCategory = async (content: SharedContent) => {
     try {
       const updatedContent = [...sharedContent, content];
-      await AsyncStorage.setItem('shared_content', JSON.stringify(updatedContent));
+      await sharedStorage.setItem('shared_content', JSON.stringify(updatedContent));
       setSharedContent(updatedContent);
     } catch (error) {
-      console.error('Error adding content to folder:', error);
+      console.error('Error adding content to category:', error);
     }
   };
 
@@ -57,6 +71,6 @@ export function useSharedContent() {
     isLoading,
     loadSharedContent,
     clearSharedContent,
-    addToFolder,
+    addToCategory,
   };
 }

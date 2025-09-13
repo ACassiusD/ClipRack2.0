@@ -42,11 +42,39 @@ open ios/ClipRack.xcworkspace
 npx expo run:ios --device
 ```
 
-## 📱 Share Extension
+## 📱 Share Extension (In Development)
 
 This app uses **expo-share-extension** to create an iOS share extension that allows users to share content from other apps (Safari, Instagram, TikTok, YouTube, etc.) directly into ClipRack.
 
-### Configuration
+
+### 📋 Share Process Flow
+1. **User shares content** from any app (Instagram, TikTok, YouTube, Safari, etc.)
+2. **Share extension popup appears** with ClipRack's custom interface
+3. **User can optionally select a category** for the shared content
+4. **Content is saved** to shared storage (MMKV with App Groups)
+5. **Share extension closes** without opening the main app
+6. **Main app displays** the new content in the clips gallery
+
+### 🔧 Technical Implementation
+
+#### Core Modules
+- **`expo-share-extension`** - Main share extension framework
+- **`react-native-mmkv`** - High-performance shared storage with App Groups support, enables sharing between the main app and the share app
+- **`@react-native-async-storage/async-storage`** - Fallback storage solution
+
+#### Storage Architecture
+```
+┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐
+│   Main App      │    │   App Group      │    │  Share Extension│
+│                 │    │   (MMKV)         │    │                 │
+│ • cliprack_     │◄──►│ • cliprack_      │◄──►│ • cliprack_     │
+│   embeds        │    │   embeds         │    │   embeds        │
+│ • cliprack_     │    │ • cliprack_      │    │ • cliprack_     │
+│   categories    │    │   categories     │    │   categories    │
+└─────────────────┘    └──────────────────┘    └─────────────────┘
+```
+
+#### Configuration
 - **Main App Bundle ID**: `com.alexdonnelly.ClipRackApp`
 - **Share Extension Bundle ID**: `com.alexdonnelly.ClipRackApp.ShareExtension`
 - **App Group**: `group.com.alexdonnelly.ClipRackApp`

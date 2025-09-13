@@ -66,6 +66,9 @@
             "green": 255,
             "blue": 255,
             "alpha": 0.95
+          },
+          "entitlements": {
+            "com.apple.security.application-groups": ["group.com.alexdonnelly.ClipRackApp"]
           }
         }
       ]
